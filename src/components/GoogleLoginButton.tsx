@@ -1,4 +1,3 @@
-/* eslint-disable */
 "use client";
 
 import { supabase } from "../lib/supabaseClient";
@@ -6,7 +5,7 @@ import "./CSS/GoogleLoginButton.css";
 
 const GoogleLoginButton = () => {
   async function testLogin() {
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
     });
 
