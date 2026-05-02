@@ -1,4 +1,3 @@
-import { useState } from 'react' // eslint-disable-line
 
 function LandingPage() {
 
