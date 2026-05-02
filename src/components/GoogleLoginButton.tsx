@@ -2,7 +2,7 @@
 "use client";
 
 import { supabase } from "../lib/supabaseClient";
-import "./CSS/GoogleLoginButton.css"
+import "./CSS/GoogleLoginButton.css";
 
 const GoogleLoginButton = () => {
   async function testLogin() {
@@ -18,7 +18,11 @@ const GoogleLoginButton = () => {
 
   return (
     <div>
-      <button onClick={testLogin} className="gsi-material-button" style={{ width: 100 }}>
+      <button
+        onClick={testLogin}
+        className="gsi-material-button"
+        style={{ width: 100 }}
+      >
         <div className="gsi-material-button-state"></div>
         <div className="gsi-material-button-content-wrapper">
           <div className="gsi-material-button-icon">
@@ -26,7 +30,7 @@ const GoogleLoginButton = () => {
               version="1.1"
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 48 48"
-              style={{ display: 'block' }}
+              style={{ display: "block" }}
             >
               <path
                 fill="#EA4335"
@@ -47,8 +51,10 @@ const GoogleLoginButton = () => {
               <path fill="none" d="M0 0h48v48H0z"></path>
             </svg>
           </div>
-          <span className="gsi-material-button-contents">Sign in with Google</span>
-          <span style={{ display: 'none' }}>Sign in with Google</span>
+          <span className="gsi-material-button-contents">
+            Sign in with Google
+          </span>
+          <span style={{ display: "none" }}>Sign in with Google</span>
         </div>
       </button>
     </div>
