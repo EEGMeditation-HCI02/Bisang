@@ -1,12 +1,26 @@
-import { useState } from 'react' // eslint-disable-line
+/* eslint-disable */
+"use client";
 
-function GoogleLoginButton() {
+import { supabase } from "../lib/supabaseClient";
+
+
+const GoogleLoginButton = () => {
+  async function testLogin() {
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+    });
+
+    if (error) {
+      console.log("구글 로그인 오류 발생");
+      return;
+    }
+  }
 
   return (
-    <>
-      <div>google login button</div>
-    </>
-  )
-}
+    <div>
+      <button onClick={testLogin}>구글 로그인</button>
+    </div>
+  );
+};
 
-export default GoogleLoginButton
+export default GoogleLoginButton;
