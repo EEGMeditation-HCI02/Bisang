@@ -4,9 +4,12 @@ import { supabase } from "../lib/supabaseClient";
 import "./CSS/GoogleLoginButton.css";
 
 const GoogleLoginButton = () => {
-  async function testLogin() {
+  async function googleLogin() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
+      options: {
+        redirectTo: "https://bi-sang.pages.dev/",
+      },
     });
 
     if (error) {
@@ -18,7 +21,7 @@ const GoogleLoginButton = () => {
   return (
     <div>
       <button
-        onClick={testLogin}
+        onClick={googleLogin}
         className="gsi-material-button"
         style={{ width: 100 }}
       >
