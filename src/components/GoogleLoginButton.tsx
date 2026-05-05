@@ -5,6 +5,11 @@ import "./CSS/GoogleLoginButton.css";
 
 const GoogleLoginButton = () => {
   async function googleLogin() {
+    if (!supabase) {
+      console.log("Supabase env vars are missing.");
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

@@ -3,7 +3,9 @@ function LandingPage() {
 
   return (
     <>
-      <div>landing page</div>
+      <div>landing page
+        왜 안보이노 ~~!!
+      </div>
     </>
   )
 }
