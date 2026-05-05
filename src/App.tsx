@@ -1,5 +1,5 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
-import './App.css'
+import "./App.css";
 
 import LandingPage from "./pages/LandingPage"
 //import GoogleLoginButton from "./components/GoogleLoginButton"
@@ -11,7 +11,6 @@ import { lazy, Suspense } from "react";
 const GoogleLoginButton = lazy(() => import("./components/GoogleLoginButton"))
 
 function App() {
-
   return (
     <>
       <BrowserRouter>
@@ -31,7 +30,7 @@ function App() {
         <Footer />
       </BrowserRouter>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
