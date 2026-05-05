@@ -1,0 +1,63 @@
+/* ===========================
+   Luminous Stillness Design System
+   =========================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif:ital,wght@0,400;0,700;1,400;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+
+:root {
+  /* ── Typography ── */
+  --font-headline: 'Noto Serif', serif;
+  --font-body: 'Plus Jakarta Sans', sans-serif;
+  --font-label: 'Plus Jakarta Sans', sans-serif;
+
+  /* ── Primary (올리브 골드) ── */
+  --primary:              #755C1C;
+  --primary-dim:          #5a4615;
+  --on-primary:           #FEF9F3;
+  --primary-container:    #C9A84C;
+  --on-primary-container: #1a1200;
+
+  /* ── Secondary (올리브 그린) ── */
+  --secondary:              #6B5D40;
+  --secondary-dim:          #534a32;
+  --on-secondary:           #FEF9F3;
+  --secondary-container:    #b0a07a;
+  --on-secondary-container: #1a1500;
+
+  /* ── Tertiary (웜 브라운) ── */
+  --tertiary:              #835431;
+  --tertiary-dim:          #653f23;
+  --on-tertiary:           #FEF9F3;
+  --tertiary-container:    #c49070;
+  --on-tertiary-container: #1a0a00;
+
+  /* ── Neutral (크림 베이지) ── */
+  --neutral:           #FEF9F3;
+  --neutral-dim:       #ede8e2;
+
+  /* ── Surface ── */
+  --surface:                  #FEF9F3;
+  --surface-dim:              #e8e3dd;
+  --surface-container-low:    #f3ede7;
+  --surface-container:        #ede7e1;
+  --surface-container-high:   #e7e1db;
+
+  /* ── On Surface ── */
+  --on-surface:         #1c1917;
+  --on-surface-variant: #6b6460;
+
+  /* ── Outline ── */
+  --outline:         #9c9490;
+  --outline-variant: #cec6c1;
+
+  /* ── Error ── */
+  --error:    #ba1a1a;
+  --on-error: #ffffff;
+
+  /* ── RGB 버전 (투명도 사용 시) ── */
+  --primary-rgb:          117, 92, 28;
+  --secondary-rgb:        107, 93, 64;
+  --tertiary-rgb:         131, 84, 49;
+  --surface-rgb:          254, 249, 243;
+  --outline-variant-rgb:  206, 198, 193;
+}

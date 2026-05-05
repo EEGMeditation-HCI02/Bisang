@@ -16,16 +16,18 @@ function App() {
     <>
       <BrowserRouter>
         <Header />
-        {/* <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/googleloginbutton" element={<GoogleLoginButton />} />
-        </Routes> */}
-        <Suspense fallback={<div style={{ padding: "2rem" }}>Loading...</div>}>
-          <Routes>
+        <main style={{ paddingTop: '96.5px' }}>
+          {/* <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/googleloginbutton" element={<GoogleLoginButton />} />
-          </Routes>
-        </Suspense>
+          </Routes> */}
+          <Suspense fallback={<div style={{ padding: "2rem" }}>Loading...</div>}>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/googleloginbutton" element={<GoogleLoginButton />} />
+            </Routes>
+          </Suspense>
+        </main>
         <Footer />
       </BrowserRouter>
     </>

@@ -1,0 +1,117 @@
+.nav {
+  background-color: rgba(var(--surface-rgb), 0.7);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 50;
+  border-bottom: 1px solid rgba(var(--outline-variant-rgb), 0.1);
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100;
+  padding: 1.5rem 1.5rem;
+  max-width: 1920px;
+  margin: 0 auto;
+}
+
+@media (min-width: 768px) {
+  .container {
+    padding: 1.5rem 3rem;
+  }
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-family: var(--font-headline);
+  font-style: italic;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.navLinks {
+  display: none;
+  gap: 2rem;
+  align-items: center;
+  font-family: var(--font-headline);
+  font-size: 1.125rem;
+  letter-spacing: -0.025em;
+}
+
+@media (min-width: 768px) {
+  .navLinks {
+    display: flex;
+  }
+}
+
+.navLink {
+  color: var(--on-surface-variant);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.5s;
+}
+
+.navLink:hover {
+  color: var(--primary-dim);
+}
+
+.navLinkActive {
+  color: var(--primary);
+  font-weight: 700;
+  border-bottom: 2px solid rgba(var(--primary-rgb), 0.4);
+  padding-bottom: 0.25rem;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.startButton {
+  display: none;
+  background-color: var(--primary);
+  color: var(--on-primary);
+  border-radius: 9999px;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.startButton:hover {
+  background-color: var(--primary-dim);
+}
+
+@media (min-width: 640px) {
+  .startButton {
+    display: block;
+  }
+}
+
+.iconButtons {
+  display: flex;
+  gap: 0.5rem;
+  color: var(--primary);
+}
+
+.iconButton {
+  padding: 0.5rem;
+  border-radius: 9999px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: inherit;
+  transition: background-color 0.2s;
+}
+
+.iconButton:hover {
+  background-color: var(--surface-container);
+}
