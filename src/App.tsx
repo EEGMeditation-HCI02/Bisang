@@ -27,7 +27,7 @@ function App() {
               <Route path="/googleloginbutton" element={<GoogleLoginButton />} />
             </Routes>
           </Suspense>
-        </main>
+        </main> 
         <Footer />
       </BrowserRouter>
     </>
