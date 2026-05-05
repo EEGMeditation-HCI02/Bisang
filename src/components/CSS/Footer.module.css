@@ -60,7 +60,7 @@
   text-align: center;
   max-width: 100%;
   word-break: break-word;
-  line-height: 1.5;
+  line-height: 1.5; 
 }
 
 @media (min-width: 768px) {
