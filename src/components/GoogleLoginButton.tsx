@@ -2,6 +2,7 @@
 
 import { supabase } from "../lib/supabaseClient";
 import "./css/GoogleLoginButton.css";
+// i dont know what problem is
 
 const GoogleLoginButton = () => {
   async function googleLogin() {
