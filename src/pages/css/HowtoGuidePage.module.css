@@ -1,0 +1,458 @@
+/* ============================================================
+   MindWaveGuide.module.css — BeeSang Design System
+   ============================================================ */
+
+/* ---------- CSS Variables (전역 토큰) ---------- */
+:root {
+  --color-bg: #fef9f3;
+  --color-surface-low: #f8f3eb;
+  --color-surface-mid: #f2ede5;
+  --color-surface-high: #ede8df;
+  --color-surface-highest: #e7e2d8;
+
+  --color-primary: #755c1c;
+  --color-primary-dim: #685011;
+  --color-primary-fixed: #ffdc8f;
+  --color-on-primary: #fff8f0;
+
+  --color-on-bg: #34322c;
+  --color-on-surface-variant: #625f57;
+  --color-on-surface-muted: #7e7a72;
+  --color-outline-variant: #b6b1a8;
+
+  --font-display: "Noto Serif", Georgia, serif;
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 1rem;
+  --radius-lg: 1.5rem;
+  --radius-xl: 2rem;
+  --radius-2xl: 3rem;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 3px rgba(117, 92, 28, 0.07);
+  --shadow-md: 0 4px 16px rgba(117, 92, 28, 0.1);
+  --shadow-lg: 0 16px 48px rgba(117, 92, 28, 0.14);
+  --shadow-primary: 0 8px 32px rgba(117, 92, 28, 0.18);
+
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 700ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   ROOT
+   ============================================================ */
+.root {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-on-bg);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+}
+
+.root *,
+.root *::before,
+.root *::after {
+  box-sizing: border-box;
+}
+
+
+
+.iconBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-on-surface-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem;
+  border-radius: var(--radius-sm);
+  transition:
+    color var(--transition-base),
+    background-color var(--transition-base);
+}
+
+.iconBtn:hover {
+  color: var(--color-primary);
+  background: rgba(117, 92, 28, 0.06);
+}
+
+.avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--color-surface-high);
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+.btnPrimary {
+  font-family: var(--font-body);
+  font-weight: 700;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+  transition:
+    background-color var(--transition-base),
+    transform var(--transition-base),
+    box-shadow var(--transition-base);
+}
+
+.btnPrimary:hover {
+  background: var(--color-primary-dim);
+  box-shadow: var(--shadow-primary);
+}
+
+.btnPrimary:active {
+  transform: scale(0.96);
+}
+
+.btnSm {
+  display: none;
+  padding: 0.625rem 1.75rem;
+  font-size: 0.8125rem;
+}
+
+@media (min-width: 768px) {
+  .btnSm {
+    display: block;
+  }
+}
+
+.btnLg {
+  padding: 1.25rem 4rem;
+  font-size: 1.125rem;
+  box-shadow: var(--shadow-lg);
+}
+
+/* ============================================================
+   MAIN
+   ============================================================ */
+.main {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 4rem 1.5rem 5rem;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero {
+  text-align: center;
+  max-width: 42rem;
+  margin: 0 auto 6rem;
+  animation: fadeUp 0.8s ease both;
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 6vw, 4.5rem);
+  font-weight: 700;
+  color: var(--color-on-bg);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.25rem;
+}
+
+.heroDesc {
+  font-size: 1.0625rem;
+  color: var(--color-on-surface-variant);
+  line-height: 1.75;
+}
+
+/* ============================================================
+   BENTO GRID
+   ============================================================ */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 1.5rem;
+  align-items: stretch;
+}
+
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================================
+   CARDS — 공통
+   ============================================================ */
+.card {
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  transition:
+    transform var(--transition-slow),
+    box-shadow var(--transition-slow);
+  animation: fadeUp 0.7s ease both;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ---------- Device Card ---------- */
+.cardDevice {
+  grid-column: span 7;
+  background-color: var(--color-surface-low);
+}
+
+@media (max-width: 900px) {
+  .cardDevice {
+    grid-column: span 1;
+  }
+}
+
+.cardBody {
+  padding: 3rem;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 2.5rem;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.25rem 1rem;
+  background: rgba(255, 220, 143, 0.3);
+  color: var(--color-primary-dim);
+  border-radius: var(--radius-full);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+}
+
+.cardTitle {
+  font-family: var(--font-display);
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-on-bg);
+  margin-bottom: 0.75rem;
+  letter-spacing: -0.02em;
+}
+
+.cardText {
+  color: var(--color-on-surface-variant);
+  max-width: 28rem;
+  line-height: 1.65;
+}
+
+.deviceImgWrap {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.deviceImg {
+  width: 100%;
+  display: block;
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition-slow);
+}
+
+.cardDevice:hover .deviceImg {
+  transform: scale(1.02);
+}
+
+/* ---------- Step Cards (01, 02) ---------- */
+.cardStep {
+  grid-column: span 5;
+  background-color: var(--color-surface-mid);
+  padding: 3rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  animation-delay: 0.15s;
+}
+
+@media (max-width: 900px) {
+  .cardStep {
+    grid-column: span 1;
+  }
+}
+
+.stepNum {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 4.5rem;
+  color: rgba(117, 92, 28, 0.18);
+  line-height: 1;
+  margin-bottom: 1rem;
+  letter-spacing: -0.04em;
+}
+
+.stepTitle {
+  font-family: var(--font-display);
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: var(--color-on-bg);
+  margin-bottom: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.stepDesc {
+  color: var(--color-on-surface-variant);
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.stepImgWrap {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+}
+
+.stepImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.cardStep:hover .stepImg {
+  transform: scale(1.04);
+}
+
+/* ---------- Ear Clip Card (03) ---------- */
+.cardEar {
+  grid-column: span 7;
+  background-color: var(--color-surface-low);
+  padding: 3rem;
+  display: flex;
+  flex-direction: row;
+  gap: 3rem;
+  align-items: center;
+  animation-delay: 0.3s;
+}
+
+@media (max-width: 900px) {
+  .cardEar {
+    grid-column: span 1;
+    flex-direction: column;
+  }
+}
+
+.earText {
+  flex: 1;
+}
+
+.earImgWrap {
+  flex: 1;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.earImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: var(--radius-lg);
+  transition: transform var(--transition-slow);
+}
+
+.cardEar:hover .earImg {
+  transform: scale(1.03);
+}
+
+/* ============================================================
+   CTA
+   ============================================================ */
+.cta {
+  margin-top: 5rem;
+  border-radius: var(--radius-2xl);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 5rem 3rem;
+  background: rgba(254, 249, 243, 0.6);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  animation: fadeUp 0.8s 0.4s ease both;
+}
+
+.ctaBg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  opacity: 0.18;
+  z-index: 0;
+}
+
+.ctaContent {
+  position: relative;
+  z-index: 1;
+  max-width: 36rem;
+}
+
+.ctaTitle {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 700;
+  color: var(--color-on-bg);
+  margin-bottom: 1rem;
+  letter-spacing: -0.03em;
+}
+
+.ctaDesc {
+  color: var(--color-on-surface-variant);
+  margin-bottom: 3rem;
+  line-height: 1.7;
+  font-size: 1rem;
+}
+
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   SCROLLBAR
+   ============================================================ */
+:global(::-webkit-scrollbar) {
+  width: 6px;
+}
+
+:global(::-webkit-scrollbar-track) {
+  background: var(--color-surface-low);
+}
+
+:global(::-webkit-scrollbar-thumb) {
+  background: var(--color-outline-variant);
+  border-radius: var(--radius-full);
+}
+
+:global(::-webkit-scrollbar-thumb:hover) {
+  background: var(--color-on-surface-muted);
+}
+
+/* ============================================================
+   SELECTION
+   ============================================================ */
+:global(::selection) {
+  background: var(--color-primary-fixed);
+  color: var(--color-on-bg);
+}
