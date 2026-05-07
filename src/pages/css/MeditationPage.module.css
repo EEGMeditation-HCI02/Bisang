@@ -1,0 +1,467 @@
+/* ============================================================
+   MeditationSession.module.css — BeeSang Design System
+   ============================================================ */
+
+/* ---------- Design Tokens ---------- */
+:root {
+  --color-bg: #fef9f3;
+  --color-surface-lowest: #ffffff;
+  --color-surface-low: #f8f3eb;
+  --color-surface-mid: #f2ede5;
+  --color-surface-high: #ede8df;
+
+  --color-primary: #755c1c;
+  --color-primary-dim: #685011;
+  --color-primary-container: #ffdc8f;
+  --color-on-primary: #fff8f0;
+
+  --color-secondary: #6b5d40;
+  --color-secondary-dim: #5f5235;
+  --color-tertiary: #835431;
+
+  --color-on-surface: #34322c;
+  --color-on-surface-variant: #625f57;
+  --color-outline-variant: #b6b1a8;
+
+  --font-display: "Noto Serif", Georgia, serif;
+  --font-body: "Plus Jakarta Sans", system-ui, sans-serif;
+
+  --radius-full: 9999px;
+  --radius-card: 2.5rem;
+
+  --shadow-card: 0 40px 100px -30px rgba(117, 92, 28, 0.12);
+  --shadow-orb: 0 0 60px rgba(117, 92, 28, 0.2), inset -10px -10px 30px rgba(117, 92, 28, 0.3);
+  --shadow-play: 0 8px 32px rgba(117, 92, 28, 0.28);
+
+  --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================================
+   ROOT — full-screen layout
+   ============================================================ */
+.root {
+  font-family: var(--font-body);
+  background-color: var(--color-bg);
+  color: var(--color-on-surface);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1.5rem;
+  position: relative;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+.root *,
+.root *::before,
+.root *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ============================================================
+   AMBIENT GLOW
+   ============================================================ */
+.ambientGlow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(
+    circle,
+    rgba(117, 92, 28, 0.28) 0%,
+    rgba(253, 191, 147, 0.1) 50%,
+    transparent 70%
+  );
+  opacity: 0.6;
+  pointer-events: none;
+  border-radius: var(--radius-full);
+}
+
+/* ============================================================
+   BACK BUTTON
+   ============================================================ */
+.backBtn {
+  position: absolute;
+  top: 2rem;
+  left: 2rem;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-lowest);
+  border: 1px solid rgba(182, 177, 168, 0.15);
+  box-shadow: 0 1px 4px rgba(52, 50, 44, 0.06);
+  color: var(--color-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition:
+    background-color var(--transition-base),
+    transform var(--transition-base);
+  z-index: 10;
+}
+
+.backBtn:hover {
+  background: var(--color-surface-low);
+  transform: translateX(-2px);
+}
+
+.backBtn:active {
+  transform: scale(0.94);
+}
+
+@media (min-width: 768px) {
+  .backBtn {
+    left: 3rem;
+    top: 2.5rem;
+  }
+}
+
+/* ============================================================
+   EDITORIAL QUOTE
+   ============================================================ */
+.quote {
+  position: absolute;
+  bottom: 5rem;
+  right: 3rem;
+  display: none;
+  max-width: 18rem;
+  text-align: right;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1rem;
+  line-height: 1.75;
+  color: rgba(95, 82, 53, 0.35);
+  pointer-events: none;
+}
+
+@media (min-width: 1024px) {
+  .quote {
+    display: block;
+  }
+}
+
+/* ============================================================
+   CENTRAL CARD
+   ============================================================ */
+.card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 38rem;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 3.5rem 3rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+  animation: fadeUp 0.7s ease both;
+}
+
+@media (min-width: 768px) {
+  .card {
+    padding: 5rem 5rem;
+  }
+}
+
+/* ============================================================
+   CARD HEADER
+   ============================================================ */
+.cardHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 3.5rem;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(2.75rem, 7vw, 3.75rem);
+  font-weight: 300;
+  color: var(--color-primary);
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.listeningBadge {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  justify-content: center;
+}
+
+/* Pulse dot */
+.pulseDot {
+  position: relative;
+  display: inline-flex;
+  width: 0.5rem;
+  height: 0.5rem;
+  flex-shrink: 0;
+}
+
+.pingRing {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background: var(--color-tertiary);
+  opacity: 0.75;
+  animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.dotCore {
+  position: relative;
+  display: inline-flex;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-tertiary);
+}
+
+.listeningLabel {
+  font-size: 0.6875rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+  font-weight: 500;
+}
+
+/* ============================================================
+   ORB
+   ============================================================ */
+.orbWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20rem;
+  height: 20rem;
+  margin-bottom: 3.5rem;
+}
+
+.ringOuter {
+  position: absolute;
+  width: 16rem;
+  height: 16rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(117, 92, 28, 0.1);
+  animation: pulseSlow 4s ease-in-out infinite;
+}
+
+.ringInner {
+  position: absolute;
+  width: 20rem;
+  height: 20rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(117, 92, 28, 0.05);
+  animation: pulseSlow 6s ease-in-out infinite;
+}
+
+.orb {
+  width: 12rem;
+  height: 12rem;
+  border-radius: var(--radius-full);
+  background: radial-gradient(circle at 30% 30%, #ffdc8f, #fdbf93 40%, #755c1c 80%);
+  box-shadow: var(--shadow-orb);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: breathe 6s ease-in-out infinite;
+}
+
+.orbGlow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-full);
+  background: white;
+  opacity: 0.18;
+  filter: blur(18px);
+}
+
+/* ============================================================
+   SUBTITLE
+   ============================================================ */
+.subtitle {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.375rem;
+  font-weight: 300;
+  color: var(--color-secondary);
+  opacity: 0.78;
+  margin-bottom: 3.5rem;
+}
+
+/* ============================================================
+   TIMER SECTION
+   ============================================================ */
+.timerSection {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+}
+
+.timerDisplay {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 1.5rem;
+  letter-spacing: 0.08em;
+  color: rgba(117, 92, 28, 0.8);
+}
+
+.timerElapsed {
+  font-weight: 600;
+}
+
+.timerDivider {
+  opacity: 0.3;
+  font-weight: 300;
+}
+
+.timerTotal {
+  opacity: 0.45;
+  font-weight: 300;
+}
+
+/* ---------- Progress Bar ---------- */
+.progressBar {
+  width: 100%;
+  max-width: 20rem;
+  height: 3px;
+  background: var(--color-surface-high);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: rgba(117, 92, 28, 0.6);
+  border-radius: var(--radius-full);
+  box-shadow: 0 0 8px rgba(117, 92, 28, 0.22);
+  transition: width 1s linear;
+}
+
+/* ---------- Controls ---------- */
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 0.75rem;
+}
+
+.controlBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-on-surface-variant);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.375rem;
+  border-radius: var(--radius-full);
+  transition:
+    color var(--transition-base),
+    transform var(--transition-base);
+}
+
+.controlBtn:hover {
+  color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+.controlBtn:active {
+  transform: scale(0.92);
+}
+
+.playPauseBtn {
+  width: 4rem;
+  height: 4rem;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-play);
+  transition:
+    transform var(--transition-base),
+    box-shadow var(--transition-base),
+    background-color var(--transition-base);
+}
+
+.playPauseBtn:hover {
+  transform: scale(1.07);
+  box-shadow: 0 12px 40px rgba(117, 92, 28, 0.36);
+}
+
+.playPauseBtn:active {
+  transform: scale(0.95);
+}
+
+/* ============================================================
+   KEYFRAMES
+   ============================================================ */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseSlow {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(1.04);
+  }
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: var(--shadow-orb);
+  }
+  50% {
+    transform: scale(1.06);
+    box-shadow: 0 0 90px rgba(117, 92, 28, 0.28), inset -10px -10px 40px rgba(117, 92, 28, 0.35);
+  }
+}
+
+/* ============================================================
+   GLOBAL
+   ============================================================ */
+:global(::selection) {
+  background: var(--color-primary-container);
+  color: var(--color-on-surface);
+}

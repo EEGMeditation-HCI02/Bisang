@@ -4,6 +4,7 @@ import './App.css'
 import LandingPage from "./pages/LandingPage"
 import HowtoGuidePage from "./pages/HowtoGuidePage"
 import DashboardPage from "./pages/DashboardPage"
+import MeditationPage from "./pages/MeditationPage"
 
 import GoogleLoginButton from "./components/GoogleLoginButton"
 import Header from "./components/Header"
@@ -21,6 +22,7 @@ function App() {
             <Route path="/googleloginbutton" element={<GoogleLoginButton />} />
             <Route path="/howtoguide" element={<HowtoGuidePage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/meditation" element={<MeditationPage />} />
           </Routes>
         </main> 
         <Footer />
