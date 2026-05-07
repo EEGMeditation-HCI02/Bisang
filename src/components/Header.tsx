@@ -1,4 +1,4 @@
-import { Bell, Settings } from 'lucide-react';
+import { Settings } from 'lucide-react';
 import { motion } from 'motion/react';
 import styles from './CSS/Header.module.css';
 
