@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 import styles from "./css/HowtoGuidePage.module.css";
 
 
@@ -23,14 +23,13 @@ const STEPS = [
 
 
 export default function MindWaveGuide() {
-  const [scrolled, setScrolled] = useState(false);
-  const [activeNav, setActiveNav] = useState("Meditation");
+  // const [scrolled, setScrolled] = useState(false);
 
-  useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  // useEffect(() => {
+  //   const handleScroll = () => setScrolled(window.scrollY > 20);
+  //   window.addEventListener("scroll", handleScroll);
+  //   return () => window.removeEventListener("scroll", handleScroll);
+  // }, []);
 
   return (
     <div className={styles.root}>
