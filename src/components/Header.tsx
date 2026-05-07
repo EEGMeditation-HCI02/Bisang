@@ -11,7 +11,7 @@ export default function Header() {
           animate={{ opacity: 1, x: 0 }}
           className={styles.logo}
         >
-          BeeSang
+          BiSang
         </motion.div>
         
         <div className={styles.navLinks}>
@@ -31,9 +31,6 @@ export default function Header() {
           </motion.button>
           
           <div className={styles.iconButtons}>
-            <button className={styles.iconButton}>
-              <Bell size={20} />
-            </button>
             <button className={styles.iconButton}>
               <Settings size={20} />
             </button>
