@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import styles from "./css/MeditationPage.module.css";
 
-const TOTAL_SECONDS = 15 * 60; // 15:00
+const TOTAL_SECONDS = 15 * 60;
 
 export default function MeditationSession() {
   const [elapsed, setElapsed] = useState(4 * 60 + 28); // 04:28 초기값
