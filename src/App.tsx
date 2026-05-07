@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import './App.css'
 
 import LandingPage from "./pages/LandingPage"
+import GuidePage from "./pages/GuidePage"
 
 import GoogleLoginButton from "./components/GoogleLoginButton"
 import Header from "./components/Header"
@@ -17,6 +18,7 @@ function App() {
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/googleloginbutton" element={<GoogleLoginButton />} />
+            <Route path="/guide" element={<GuidePage />} />
           </Routes>
         </main> 
         <Footer />
