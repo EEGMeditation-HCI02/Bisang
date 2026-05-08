@@ -5,6 +5,7 @@ import LandingPage from "./pages/LandingPage"
 import HowtoGuidePage from "./pages/HowtoGuidePage"
 import DashboardPage from "./pages/DashboardPage"
 import MeditationPage from "./pages/MeditationPage"
+import MeditationSetupPage from "./pages/MeditationSetupPage"
 
 import GoogleLoginButton from "./components/GoogleLoginButton"
 import Header from "./components/Header"
@@ -23,6 +24,7 @@ function App() {
             <Route path="/howtoguide" element={<HowtoGuidePage />} />
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/meditation" element={<MeditationPage />} />
+            <Route path="/meditationsetup" element={<MeditationSetupPage />} />
           </Routes>
         </main> 
         <Footer />
