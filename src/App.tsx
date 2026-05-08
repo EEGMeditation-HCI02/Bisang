@@ -6,6 +6,9 @@ import HowtoGuidePage from "./pages/HowtoGuidePage"
 import DashboardPage from "./pages/DashboardPage"
 import MeditationPage from "./pages/MeditationPage"
 import MeditationSetupPage from "./pages/MeditationSetupPage"
+import TestGuidePage from "./pages/TestGuidePage"
+import UserSettingPage from "./pages/UserSettingPage" 
+import SettingGuidePage from "./pages/SettingGuidePage"
 
 import GoogleLoginButton from "./components/GoogleLoginButton"
 import Header from "./components/Header"
@@ -40,6 +43,9 @@ function App() {
           <Route path="/dashboard" element={<DashboardPage />} />
           <Route path="/meditation" element={<MeditationPage />} />
           <Route path="/meditationsetup" element={<MeditationSetupPage />} />
+          <Route path="/testguide" element={<TestGuidePage />} />
+          <Route path="/usersetting" element={<UserSettingPage />} />
+          <Route path="/settingguide" element={<SettingGuidePage />} />
         </Routes>
       </Layout>
     </BrowserRouter>
