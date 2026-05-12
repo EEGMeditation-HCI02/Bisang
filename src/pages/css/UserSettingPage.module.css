@@ -99,10 +99,8 @@
 .layout {
   position: relative;
   z-index: 1;
-  width: 100%;
+  width: 30%;
   max-width: 64rem;
-  display: grid;
-  grid-template-columns: 1fr;
   gap: 3rem;
   align-items: center;
 }

@@ -48,6 +48,8 @@
 
 .landing-title-accent {
   color: #755C1C;
+  margin-top: 20px;
+  height: 72px;
   font-size: 72px;
   font-family: Noto Serif;
   font-weight: 400;
@@ -85,7 +87,6 @@
   position: relative;
   background: rgba(254, 249, 243, 0.60);
   border-radius: 12px;
-  outline: 1px rgba(182, 177, 168, 0.20) solid;
   outline-offset: -1px;
   backdrop-filter: blur(12px);
   flex-direction: column;

@@ -1,4 +1,8 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "../lib/supabaseClient";
+import { useUser } from "../contexts/userContextHelpers";
+
 import styles from "./css/UserSettingPage.module.css";
 
 const AGE_OPTIONS = ["18-24", "25-34", "35-44", "45-54", "55+"];
@@ -42,10 +46,32 @@ const FOCUS_OPTIONS = [
   },
 ];
 
-export default function PersonalDetails() {
+export default function UserSettingPage() {
+  const { user } = useUser();
   const [name, setName] = useState("");
   const [age, setAge] = useState("");
   const [focus, setFocus] = useState("");
+
+  const navigate = useNavigate();
+  const handleSave = async () => {
+    console.log("에이 설마");
+    if (!user) return;
+    console.log("button clicked!");
+    console.log("user:", user.id);
+    if (!supabase) return;
+
+    const { error, data } = await supabase
+      .from("profiles")
+      .upsert({ id: user.id, name, age_group: age, primary_focus: focus });
+    console.log("upsert result:", { error, data });
+
+    if (error) {
+      alert("저장 실패: " + error.message);
+    } else {
+      alert("저장 완료!");
+      navigate("/dashboard");
+    }
+  };
 
   return (
     <div className={styles.root}>
@@ -54,32 +80,11 @@ export default function PersonalDetails() {
       <div className={styles.blobBottomLeft} />
 
       <div className={styles.layout}>
-        {/* ── Left: Editorial Image ── */}
-        <div className={styles.imageCol}>
-          <div className={styles.imageWrap}>
-            <img
-              src="https://lh3.googleusercontent.com/aida/ADBb0uiy_1rZfJAWp6ZMtUPWOeWVsSbeVVdD4SEHdBdEgWRMXDjH2G6WX1sSwiLVAlVNF0e4Er_k6vcTQxRh-mOw_EzSINsGvulFLUAAqcyo5JPJ-2j50ccDXXoFptD1pFk5C5JUOcA3NII_eaNZUWdjrwxo7ZQm21hHlEA8aGOYcg4QVmkhI0CyukD8aS-7i1enaIdoCaM1zLUINaxlb5GfWcVpyuOC-c1fXzl0j3LsBagR40VLoGswWIgLRnABTA1_0m_5xbTUiwIXwA"
-              alt="Sanctuary interior"
-              className={styles.image}
-            />
-            <div className={styles.imageOverlay}>
-              <h2 className={styles.imageTitle}>
-                Your journey to <br />clarity begins here.
-              </h2>
-              <p className={styles.imageSub}>The Resonant Glow Series</p>
-            </div>
-          </div>
-        </div>
-
         {/* ── Right: Form ── */}
         <div className={styles.formCol}>
           {/* Step indicator */}
           <div className={styles.stepRow}>
-            <span className={styles.stepLabel}>Step 01 of 03</span>
             <h1 className={styles.formTitle}>Personal Details</h1>
-            <p className={styles.formSubtitle}>
-              Tailor your neural synchronization experience by sharing your focus goals.
-            </p>
           </div>
 
           <div className={styles.form}>
@@ -106,14 +111,20 @@ export default function PersonalDetails() {
                   >
                     <option value="">Select your age range</option>
                     {AGE_OPTIONS.map((o) => (
-                      <option key={o} value={o}>{o}</option>
+                      <option key={o} value={o}>
+                        {o}
+                      </option>
                     ))}
                   </select>
                   {/* Chevron icon */}
                   <svg
                     className={styles.selectChevron}
-                    width="18" height="18" viewBox="0 0 24 24"
-                    fill="none" stroke="currentColor" strokeWidth="2"
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
                   >
                     <path d="M6 9l6 6 6-6" />
                   </svg>
@@ -156,16 +167,12 @@ export default function PersonalDetails() {
             </div>
 
             {/* ── CTA ── */}
-            <button className={styles.btnContinue} type="button">
-              Continue
-              <svg
-                width="20" height="20" viewBox="0 0 24 24"
-                fill="none" stroke="currentColor" strokeWidth="2.5"
-                strokeLinecap="round" strokeLinejoin="round"
-                className={styles.btnArrow}
-              >
-                <path d="M5 12h14m-7-7 7 7-7 7" />
-              </svg>
+            <button
+              className={styles.btnContinue}
+              type="button"
+              onClick={handleSave}
+            >
+              Save
             </button>
           </div>
         </div>
