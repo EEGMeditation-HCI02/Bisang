@@ -1,6 +1,9 @@
+import { useUser } from "../contexts/userContextHelpers";
+
 import styles from "./css/DashboardPage.module.css";
 
 export default function Dashboard() {
+  const { user } = useUser();
 
   return (
     <div className={styles.root}>
@@ -8,13 +11,12 @@ export default function Dashboard() {
       <main className={styles.main}>
         {/* Welcome */}
         <section className={styles.welcome}>
-          <h1 className={styles.welcomeTitle}>Hello, 000</h1>
+          <h1 className={styles.welcomeTitle}>Hello, {user?.name}</h1>
           <p className={styles.welcomeSubtitle}>Welcome to your sanctuary.</p>
         </section>
 
         {/* Bento Grid */}
         <div className={styles.grid}>
-
           {/* Today's Meditation — Hero Card */}
           <div className={`${styles.card} ${styles.cardMeditation}`}>
             {/* Gradient overlay */}
@@ -30,18 +32,27 @@ export default function Dashboard() {
             <div className={styles.cardMeditationContent}>
               <div>
                 <h2 className={styles.cardHeadline}>Today's Meditation</h2>
-                <p className={styles.cardSubtext}>Find your center with guided mindfulness.</p>
+                <p className={styles.cardSubtext}>
+                  Find your center with guided mindfulness.
+                </p>
               </div>
               <div className={styles.meditationPlayer}>
                 <button className={styles.playBtn} aria-label="Play">
                   {/* Play icon */}
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+                  <svg
+                    width="28"
+                    height="28"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </button>
                 <div className={styles.meditationMeta}>
                   <span className={styles.meditationName}>Morning Clarity</span>
-                  <span className={styles.meditationDetail}>15 min • Alpha Waves</span>
+                  <span className={styles.meditationDetail}>
+                    15 min • Alpha Waves
+                  </span>
                 </div>
               </div>
             </div>
@@ -52,12 +63,19 @@ export default function Dashboard() {
             <div className={styles.cardProfileTop}>
               <div className={styles.profileAvatar}>
                 <img
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAK_RT9IaJK8EiTir-BsQx_iP4Ngj5Q_tuXRhzgOQs8sSba6GEzKjMD_3bTayl0G0MQX7F3GWs11i0fx3RmcOVJ-JukEeVcZubUX7_Z8dkG5i4n_1dbd5ll_yzYpL1w_f7e1y90C14S5ktyjTSFRLMrRzs5f2GiDRY0UWJD8dCDVYluiRoHfzEXZ86X4FnxMGZyXK21YO7HoUejYCT8zPtsd53nlAnIPWomdyjaPk_OzzOx1dMNE_kpsTk8JHQ0hW2-Ntu1SWqhjSVm"
+                  src= {user?.avatar_url}
                   alt="User Profile"
                 />
               </div>
               <span className={styles.arrowIcon}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
                   <path d="M5 12h14M12 5l7 7-7 7" />
                 </svg>
               </span>
@@ -72,15 +90,27 @@ export default function Dashboard() {
           <div className={`${styles.card} ${styles.cardFeedback}`}>
             <div className={styles.cardHeader}>
               <span className={styles.iconWrap}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" fill="currentColor" stroke="none" />
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                >
+                  <path
+                    d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"
+                    fill="currentColor"
+                    stroke="none"
+                  />
                 </svg>
               </span>
               <h3 className={styles.cardHeadline}>Today's Feedback</h3>
             </div>
             <div className={styles.feedbackBox}>
               <p className={styles.feedbackQuote}>
-                "Your focus was deeply sustained today. The resonant glow indicates a calm state."
+                "Your focus was deeply sustained today. The resonant glow
+                indicates a calm state."
               </p>
             </div>
             <button className={styles.linkBtn}>View Details</button>
@@ -90,7 +120,12 @@ export default function Dashboard() {
           <div className={`${styles.card} ${styles.cardReport}`}>
             <div className={styles.cardHeader}>
               <span className={styles.iconWrap}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                <svg
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
                   <path d="M3 3v18h18v-2H5V3H3zm16 14l-5-5-3 3-4-4-1.5 1.5L11 17l3-3 5 5 1.5-1.5z" />
                 </svg>
               </span>
@@ -114,10 +149,8 @@ export default function Dashboard() {
 
             <button className={styles.linkBtn}>Full Report</button>
           </div>
-
         </div>
       </main>
-
     </div>
   );
 }

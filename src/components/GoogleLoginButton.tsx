@@ -95,10 +95,17 @@ const GoogleLoginButton = () => {
       return;
     }
 
+    const isLocal =
+      window.location.hostname === "localhost" ||
+      window.location.hostname === "127.0.0.1";
+    const redirectTo = isLocal
+      ? "http://localhost:5173/"
+      : "https://bi-sang.pages.dev/";
+
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: "https://bi-sang.pages.dev/",
+        redirectTo: redirectTo,
       },
     });
     if (error) {
