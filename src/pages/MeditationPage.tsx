@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from 'react-router-dom';
 import styles from "./css/MeditationPage.module.css";
 
 const TOTAL_SECONDS = 15 * 60;
 
 export default function MeditationSession() {
+  const navigate = useNavigate();
   const [elapsed, setElapsed] = useState(4 * 60 + 28); // 04:28 초기값
   const [isPlaying, setIsPlaying] = useState(true);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -39,7 +41,7 @@ export default function MeditationSession() {
       <div className={styles.ambientGlow} />
 
       {/* Back button */}
-      <button className={styles.backBtn} aria-label="Go back">
+      <button className={styles.backBtn} aria-label="Go back" onClick={() => navigate('/meditationsetup')}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M19 12H5M12 5l-7 7 7 7" />
         </svg>
