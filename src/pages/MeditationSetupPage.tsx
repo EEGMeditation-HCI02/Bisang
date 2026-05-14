@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import styles from "./css/MeditationSetupPage.module.css";
 const THEMES = [
   {
@@ -88,13 +89,14 @@ const WAVEFORM_BARS = [
 ];
 
 export default function MeditationSetup() {
+  const navigate = useNavigate();
   const [selected, setSelected] = useState("relationships");
 
   return (
     <div className={styles.root}>
       {/* ── Header ── */}
       <header className={styles.header}>
-        <button className={styles.backBtn} aria-label="Go back">
+        <button className={styles.backBtn} aria-label="Go back" onClick={() => navigate('/dashboard')}>
           <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="20">
             <path d="m15 18-6-6 6-6" />
           </svg>
