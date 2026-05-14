@@ -7,6 +7,7 @@ const NAV_ITEMS = [
   { label: 'Dashboard',  to: '/dashboard' },
   { label: 'Meditation', to: '/meditationsetup' },
   { label: 'Reports',    to: '/reports' },
+  { label: 'Profile',   to: '/profile' },
 ];
 
 export default function Header() {
@@ -44,11 +45,6 @@ export default function Header() {
             >
               Start Session
             </motion.div>
-          </NavLink>
-          <NavLink to="/profile" className={styles.iconButtons}>
-             <button className={styles.iconButton}>
-              <Settings size={20} />
-            </button>
           </NavLink>
         </div>
       </div>
