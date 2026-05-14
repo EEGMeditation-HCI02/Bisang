@@ -1,0 +1,427 @@
+/* ============================================================
+   ProfilePage.module.css — BiSang Design System
+   ============================================================ */
+
+.root {
+    background-color: var(--surface);
+    /* #FEF9F3 */
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    font-family: var(--font-body);
+}
+
+.main {
+    width: 100%;
+    max-width: 1280px;
+    padding: 64px 48px 124px;
+    display: flex;
+    flex-direction: column;
+    gap: 64px;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+.header {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.title {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 48px;
+    line-height: 48px;
+    letter-spacing: -1.2px;
+    color: var(--primary);
+    /* #755C1C */
+    margin: 0;
+}
+
+.subtitle {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 29px;
+    color: var(--on-surface-variant);
+    /* #625F57 */
+    margin: 0;
+}
+
+/* ============================================================
+   BENTO GRID LAYOUT
+   ============================================================ */
+.grid {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+@media (min-width: 1024px) {
+    .grid {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
+}
+
+/* ============================================================
+   COLUMN 1: PROFILE CARD
+   ============================================================ */
+.profileCard {
+    width: 100%;
+    max-width: 373px;
+    background: #F8F3EB;
+    border-radius: 12px;
+    padding: 56px 40px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.avatarSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 32px;
+}
+
+.avatarWrap {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin-bottom: 24px;
+}
+
+.avatarImg {
+    width: 100%;
+    height: 100%;
+    border-radius: 9999px;
+    object-fit: cover;
+}
+
+.editBtn {
+    position: absolute;
+    right: 12px;
+    bottom: 12px;
+    width: 48px;
+    height: 48px;
+    background: var(--primary);
+    border-radius: 9999px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #FFF8F0;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+.editBtn:hover {
+    transform: scale(1.05);
+}
+
+.profileName {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 36px;
+    color: var(--on-surface);
+    /* #34322C */
+    margin: 0 0 8px 0;
+    text-align: center;
+}
+
+.profileRole {
+    font-weight: 500;
+    font-size: 16px;
+    color: var(--on-surface-variant);
+    margin: 0;
+    text-align: center;
+}
+
+.statsDivider {
+    width: 100%;
+    height: 1px;
+    background: rgba(182, 177, 168, 0.2);
+    margin-bottom: 32px;
+}
+
+.statsGrid {
+    display: flex;
+    width: 100%;
+    gap: 16px;
+}
+
+.statBox {
+    flex: 1;
+    background: #F2EDE5;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.statLabel {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: var(--primary);
+}
+
+.statValue {
+    font-family: 'Liberation Serif', var(--font-headline);
+    font-size: 24px;
+    color: var(--on-surface);
+}
+
+/* ============================================================
+   COLUMN 2: PERSONAL DETAILS
+   ============================================================ */
+.personalColumn {
+    width: 100%;
+    max-width: 373px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.columnTitle {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 36px;
+    color: #78350F;
+    margin: 0;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* CARDS */
+.card {
+    background: #FFFFFF;
+    border: 1px solid rgba(182, 177, 168, 0.1);
+    box-shadow: 0px 10px 40px rgba(52, 50, 44, 0.05);
+    border-radius: 24px;
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.fieldBlock {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.fieldLabel {
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.6px;
+    text-transform: uppercase;
+    color: #78716C;
+}
+
+/* Inputs & Selects */
+.input,
+.select {
+    width: 100%;
+    height: 55px;
+    background: rgba(231, 226, 216, 0.5);
+    border-radius: 8px;
+    border: none;
+    padding: 0 24px;
+    font-family: var(--font-body);
+    font-size: 16px;
+    color: var(--on-surface);
+    outline: none;
+}
+
+.input::placeholder {
+    color: #A8A29E;
+}
+
+.selectWrap {
+    position: relative;
+    width: 100%;
+}
+
+.select {
+    appearance: none;
+    cursor: pointer;
+}
+
+.selectChevron {
+    position: absolute;
+    right: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+/* Radio List */
+.radioList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.radioRow {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border: 1px solid rgba(182, 177, 168, 0.2);
+    border-radius: 24px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.radioRowActive {
+    background: rgba(255, 220, 143, 0.05);
+    border-color: rgba(117, 92, 28, 0.2);
+}
+
+.radioLeft {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.radioIcon {
+    width: 40px;
+    height: 40px;
+    border-radius: 9999px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.radioLabel {
+    font-weight: 700;
+    font-size: 16px;
+    color: #78350F;
+    margin-bottom: 2px;
+}
+
+.radioDesc {
+    font-size: 12px;
+    color: #A8A29E;
+}
+
+.radioInput {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--primary);
+    cursor: pointer;
+}
+
+/* Save Button */
+.btnSave {
+    width: 100%;
+    height: 68px;
+    background: var(--primary);
+    border-radius: 9999px;
+    font-weight: 700;
+    font-size: 18px;
+    color: #FFF8F0;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0px 20px 25px -5px rgba(117, 92, 28, 0.2), 0px 8px 10px -6px rgba(117, 92, 28, 0.2);
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.btnSave:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.btnSave:active {
+    transform: scale(0.98);
+}
+
+/* ============================================================
+   COLUMN 3: SANCTUARY PREFERENCES
+   ============================================================ */
+.sanctuaryColumn {
+    width: 100%;
+    max-width: 373px;
+    margin-top: 77px;
+}
+
+@media (max-width: 1024px) {
+    .sanctuaryColumn {
+        margin-top: 0;
+    }
+}
+
+.sanctuaryHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.sanctuaryIcon {
+    color: var(--primary);
+}
+
+.sanctuaryTitle {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 32px;
+    color: var(--on-surface);
+    margin: 0;
+}
+
+.preferencesList {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.preferenceRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.preferenceRow:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.preferenceInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.preferenceName {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--on-surface);
+}
+
+.preferenceSelected {
+    font-size: 14px;
+    color: var(--on-surface-variant);
+}
+
+.chevronRight {
+    transform: rotate(-90deg);
+    /* Adjust SVG rotation to point right/down depending on design (image shows down) */
+}
