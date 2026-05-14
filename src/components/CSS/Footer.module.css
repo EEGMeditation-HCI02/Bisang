@@ -20,7 +20,7 @@
 @media (min-width: 768px) {
   .container {
     flex-direction: row;
-    padding: 5rem 4rem;
+    padding: 3rem 4rem;
   }
 }
 
