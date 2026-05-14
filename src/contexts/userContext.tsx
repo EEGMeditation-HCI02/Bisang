@@ -1,15 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { UserContext } from "./userContextHelpers";
 import type { UserType } from "./userContextHelpers";
+
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UserType | null>(null);
   const [loading, setLoading] = useState(true);
 
   const navigate = useNavigate();
-
+  const location = useLocation();
   useEffect(() => {
     if (!supabase) return;
 
@@ -62,10 +63,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const isNewUser =
           session.user.created_at === session.user.last_sign_in_at;
 
-        if (isNewUser) {
-          navigate("/usersetting");
-        } else {
-          navigate("/dashboard");
+        if (location.pathname === "/") {
+          if (isNewUser) {
+            navigate("/usersetting");
+          } else {
+            navigate("/dashboard");
+          }
         }
       } catch (err) {
         console.error(err);
