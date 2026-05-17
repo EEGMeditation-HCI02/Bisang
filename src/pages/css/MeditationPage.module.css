@@ -465,3 +465,223 @@
   background: var(--color-primary-container);
   color: var(--color-on-surface);
 }
+/*
+.roundIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.roundDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  transition: background-color 400ms ease, transform 400ms ease;
+}
+
+.roundDotDone {
+  background: var(--color-primary);
+  opacity: 0.4;
+}
+ 
+.roundDotActive {
+  background: var(--color-primary);
+  transform: scale(1.5);
+  box-shadow: 0 0 6px rgba(117, 92, 28, 0.5);
+}
+ 
+.roundDotPending {
+  background: var(--color-surface-high, #ede8df);
+}
+ 
+.roundLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--color-on-surface-variant, #625f57);
+  margin-left: 0.375rem;
+  text-transform: uppercase;
+}
+ 
+.orbFinished {
+  background: radial-gradient(circle at 30% 30%, #d4edda, #a8d5b5 40%, #4a8c62 80%) !important;
+  box-shadow: 0 0 60px rgba(74, 140, 98, 0.25), inset -10px -10px 30px rgba(74, 140, 98, 0.3) !important;
+} */
+/*  
+.finishBtn {
+  font-family: var(--font-display, "Noto Serif", serif);
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--color-primary, #755c1c);
+  color: var(--color-on-primary, #fff8f0);
+  border: none;
+  cursor: pointer;
+  border-radius: 9999px;
+  padding: 0.875rem 2.5rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 8px 24px rgba(117, 92, 28, 0.22);
+  transition:
+    background-color 300ms ease,
+    transform 300ms ease,
+    box-shadow 300ms ease;
+}
+ 
+.finishBtn:hover {
+  background: var(--color-primary-dim, #685011);
+  box-shadow: 0 12px 32px rgba(117, 92, 28, 0.32);
+}
+ 
+.finishBtn:active {
+  transform: scale(0.96);
+} */
+
+.sessionLayout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 60rem;
+  padding: 0 1rem;
+}
+ 
+/* ── 좌 / 우 세션 이동 버튼 ── */
+.sideBtn {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 3.75rem;
+  padding: 1.125rem 0.5rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(182, 177, 168, 0.22);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--color-primary, #755c1c);
+  cursor: pointer;
+  transition:
+    background-color 250ms ease,
+    box-shadow 250ms ease,
+    transform 250ms ease,
+    opacity 250ms ease;
+}
+ 
+.sideBtn:hover {
+  background: rgba(255, 255, 255, 0.85);
+  box-shadow: 0 4px 18px rgba(117, 92, 28, 0.14);
+  transform: scale(1.07);
+}
+ 
+.sideBtn:active {
+  transform: scale(0.94);
+}
+ 
+/* 1라운드(이전 없음) / 4라운드(다음 없음) 일 때 숨김 */
+.sideBtnHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+ 
+.sideBtnLabel {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant, #625f57);
+  white-space: nowrap;
+}
+ 
+/* ── Round Indicator dots ── */
+.roundIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+ 
+.roundDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition:
+    background-color 350ms ease,
+    transform 350ms ease,
+    box-shadow 350ms ease;
+}
+ 
+/* 완료된 라운드 */
+.roundDotDone {
+  background: var(--color-primary, #755c1c);
+  opacity: 0.35;
+}
+ 
+/* 현재 라운드 */
+.roundDotActive {
+  background: var(--color-primary, #755c1c);
+  transform: scale(1.7);
+  box-shadow: 0 0 6px rgba(117, 92, 28, 0.45);
+  cursor: default;
+}
+ 
+/* 미진행 라운드 */
+.roundDotPending {
+  background: var(--color-surface-high, #ede8df);
+}
+ 
+.roundLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant, #625f57);
+  margin-left: 0.375rem;
+}
+ 
+/* ── 완료 상태 Orb ── */
+.orbFinished {
+  background: radial-gradient(
+    circle at 30% 30%,
+    #d4edda,
+    #a8d5b5 40%,
+    #4a8c62 80%
+  ) !important;
+  box-shadow:
+    0 0 60px rgba(74, 140, 98, 0.25),
+    inset -10px -10px 30px rgba(74, 140, 98, 0.3) !important;
+}
+ 
+/* ── 완료 후 대시보드 버튼 ── */
+.finishBtn {
+  font-family: var(--font-display, "Noto Serif", serif);
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--color-primary, #755c1c);
+  color: var(--color-on-primary, #fff8f0);
+  border: none;
+  cursor: pointer;
+  border-radius: 9999px;
+  padding: 0.875rem 2.5rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 8px 24px rgba(117, 92, 28, 0.22);
+  transition:
+    background-color 300ms ease,
+    transform 300ms ease,
+    box-shadow 300ms ease;
+}
+ 
+.finishBtn:hover {
+  background: var(--color-primary-dim, #685011);
+  box-shadow: 0 12px 32px rgba(117, 92, 28, 0.32);
+}
+ 
+.finishBtn:active {
+  transform: scale(0.96);
+}
