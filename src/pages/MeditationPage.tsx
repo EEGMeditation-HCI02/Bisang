@@ -7,8 +7,6 @@ const TOTAL_ROUNDS = 4;
 export default function MeditationSession() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-
-  // setup에서 선택한 분 (3 / 5 / 10) — 라운드 1개의 길이
   const durationMin = parseInt(searchParams.get('duration') || '3');
   const ROUND_SECONDS = durationMin * 60;
 
@@ -20,7 +18,6 @@ export default function MeditationSession() {
 
   useEffect(() => {
     if (isFinished) return;
-
     if (isPlaying) {
       intervalRef.current = setInterval(() => {
         setElapsed((prev) => {
@@ -28,10 +25,7 @@ export default function MeditationSession() {
           if (next >= ROUND_SECONDS) {
             clearInterval(intervalRef.current!);
             if (currentRound < TOTAL_ROUNDS) {
-              setTimeout(() => {
-                setCurrentRound((r) => r + 1);
-                setElapsed(0);
-              }, 800);
+              setTimeout(() => { setCurrentRound((r) => r + 1); setElapsed(0); }, 800);
             } else {
               setIsFinished(true);
             }
@@ -43,10 +37,7 @@ export default function MeditationSession() {
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
-
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isPlaying, currentRound, ROUND_SECONDS, isFinished]);
 
   const formatTime = (sec: number) => {
@@ -61,7 +52,6 @@ export default function MeditationSession() {
   const skip = (delta: number) =>
     setElapsed((prev) => Math.min(Math.max(prev + delta, 0), ROUND_SECONDS));
 
-  // 라운드 이동 (dot 클릭 or 좌우 버튼)
   const goToRound = (round: number) => {
     if (round < 1 || round > TOTAL_ROUNDS) return;
     if (intervalRef.current) clearInterval(intervalRef.current);
@@ -78,26 +68,20 @@ export default function MeditationSession() {
     <main className={styles.root}>
       <div className={styles.ambientGlow} />
 
-      {/* Back button */}
-      <button
-        className={styles.backBtn}
-        aria-label="Go back"
-        onClick={() => navigate('/meditationsetup')}
-      >
+      <button className={styles.backBtn} aria-label="Go back" onClick={() => navigate('/meditationsetup')}>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
           <path d="M19 12H5M12 5l-7 7 7 7" />
         </svg>
       </button>
 
-      {/* Editorial quote */}
       <div className={styles.quote}>
         "Silence is not the absence of sound,<br />but the presence of focus."
       </div>
 
-      {/* ── 좌우 세션 버튼 + 카드 ── */}
+      {/* 좌우 버튼 + 카드 */}
       <div className={styles.sessionLayout}>
 
-        {/* 이전 라운드 버튼 */}
+        {/* 이전 */}
         <button
           className={`${styles.sideBtn} ${!canPrev ? styles.sideBtnHidden : ""}`}
           aria-label="Previous round"
@@ -111,9 +95,8 @@ export default function MeditationSession() {
           <span className={styles.sideBtnLabel}>Round {currentRound - 1}</span>
         </button>
 
-        {/* ── Central Card ── */}
+        {/* 카드 */}
         <div className={styles.card}>
-          {/* Header */}
           <header className={styles.cardHeader}>
             <h1 className={styles.title}>Meditation</h1>
             <div className={styles.listeningBadge}>
@@ -125,28 +108,22 @@ export default function MeditationSession() {
             </div>
           </header>
 
-          {/* Round dots */}
           <div className={styles.roundIndicator}>
             {Array.from({ length: TOTAL_ROUNDS }).map((_, i) => (
               <button
                 key={i}
                 className={`${styles.roundDot} ${
-                  i + 1 < currentRound
-                    ? styles.roundDotDone
-                    : i + 1 === currentRound
-                    ? styles.roundDotActive
-                    : styles.roundDotPending
+                  i + 1 < currentRound ? styles.roundDotDone
+                  : i + 1 === currentRound ? styles.roundDotActive
+                  : styles.roundDotPending
                 }`}
                 onClick={() => goToRound(i + 1)}
                 aria-label={`Go to round ${i + 1}`}
               />
             ))}
-            <span className={styles.roundLabel}>
-              Round {currentRound} / {TOTAL_ROUNDS}
-            </span>
+            <span className={styles.roundLabel}>Round {currentRound} / {TOTAL_ROUNDS}</span>
           </div>
 
-          {/* Orb */}
           <div className={styles.orbWrap}>
             <div className={styles.ringOuter} />
             <div className={styles.ringInner} />
@@ -155,15 +132,12 @@ export default function MeditationSession() {
             </div>
           </div>
 
-          {/* Subtitle */}
           <p className={styles.subtitle}>
             {isFinished ? "Session complete 🎉" : "Take a deep breath"}
           </p>
 
-          {/* Timer & Controls */}
           <div className={styles.timerSection}>
             <div className={styles.timerDisplay}>
-              {/* 남은 시간 / setup에서 선택한 분 */}
               <span className={styles.timerElapsed}>{formatTime(remaining)}</span>
               <span className={styles.timerDivider}>/</span>
               <span className={styles.timerTotal}>{formatTime(ROUND_SECONDS)}</span>
@@ -181,12 +155,7 @@ export default function MeditationSession() {
                     <text x="8.5" y="15.5" fontSize="5.5" fontFamily="sans-serif" fontWeight="bold" fill="currentColor">10</text>
                   </svg>
                 </button>
-
-                <button
-                  className={styles.playPauseBtn}
-                  aria-label={isPlaying ? "Pause" : "Play"}
-                  onClick={() => setIsPlaying((p) => !p)}
-                >
+                <button className={styles.playPauseBtn} aria-label={isPlaying ? "Pause" : "Play"} onClick={() => setIsPlaying((p) => !p)}>
                   {isPlaying ? (
                     <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor">
                       <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
@@ -197,7 +166,6 @@ export default function MeditationSession() {
                     </svg>
                   )}
                 </button>
-
                 <button className={styles.controlBtn} aria-label="Forward 10 seconds" onClick={() => skip(10)}>
                   <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M18 13c0 3.31-2.69 6-6 6s-6-2.69-6-6 2.69-6 6-6v4l5-5-5-5v4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8h-2z" />
@@ -213,7 +181,7 @@ export default function MeditationSession() {
           </div>
         </div>
 
-        {/* 다음 라운드 버튼 */}
+        {/* 다음 */}
         <button
           className={`${styles.sideBtn} ${!canNext ? styles.sideBtnHidden : ""}`}
           aria-label="Next round"
