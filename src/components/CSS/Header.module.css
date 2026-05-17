@@ -53,7 +53,7 @@
   color: var(--on-surface-variant);
   font-weight: 500;
   text-decoration: none;
-  transition: color 0.5s;
+  transition: color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .navLink:hover {
@@ -84,7 +84,7 @@
   letter-spacing: 0.05em;
   border: none;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-decoration: none;
 }
 
@@ -111,9 +111,119 @@
   background: transparent;
   cursor: pointer;
   color: inherit;
-  transition: background-color 0.2s;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .iconButton:hover {
   background-color: var(--surface-container);
+}
+
+.userProfile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.userProfile:hover {
+  opacity: 0.8;
+}
+
+.userGreeting {
+  display: none;
+  font-size: 0.875rem;
+  color: var(--on-surface-variant);
+  font-weight: 500;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: border-bottom-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (min-width: 768px) {
+  .userGreeting {
+    display: block;
+  }
+}
+
+.profileButton:hover .userGreeting {
+  border-bottom-color: var(--primary);
+}
+
+.userName {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.profileDropdown {
+  position: relative;
+}
+
+.profileButton {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 9999px;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: inherit;
+}
+
+.dropdownMenu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  background-color: var(--surface-container);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(52, 50, 44, 0.1);
+  min-width: 180px;
+  overflow: hidden;
+  z-index: 100;
+  animation: slideDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdownItem {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--on-surface-variant);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  text-align: left;
+  transition: background-color 0.3s cubic-bezier(0.4, 0, 0.2, 1), color 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.dropdownItem:hover {
+  background-color: var(--surface);
+  color: var(--on-surface);
+}
+
+.dropdownItem:last-child {
+  color: var(--error);
+}
+
+.dropdownItem:last-child:hover {
+  background-color: rgba(186, 26, 26, 0.08);
 }

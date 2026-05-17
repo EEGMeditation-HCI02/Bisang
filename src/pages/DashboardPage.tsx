@@ -63,7 +63,7 @@ export default function Dashboard() {
             <div className={styles.cardProfileTop}>
               <div className={styles.profileAvatar}>
                 <img
-                  src= {user?.avatar_url}
+                  src= {user?.avatar_url || "/public/assets/default_profile.svg"}
                   alt="User Profile"
                 />
               </div>

@@ -50,7 +50,7 @@ export default function ProfilePage() {
   const [name, setName] = useState("Unknown User");
   const [age, setAge] = useState("");
   const [focus, setFocus] = useState("meditation");
-  const [avatarUrl, setAvatarUrl] = useState("https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=300&q=80");
+  const [avatarUrl, setAvatarUrl] = useState("/public/assets/default_profile.svg");
   const [streak, setStreak] = useState("42 Days");
   const [syncStatus, setSyncStatus] = useState("Active");
   const [isLoading, setIsLoading] = useState(false);
@@ -156,9 +156,10 @@ export default function ProfilePage() {
 
       // DB URL로 최종 확정
       setAvatarUrl(publicUrl);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Failed to upload image:", err);
-      alert(`이미지 업로드에 실패했습니다.\n사유: ${err?.message || "알 수 없는 에러"}`);
+      const errorMessage = err instanceof Error ? err.message : "알 수 없는 에러";
+      alert(`이미지 업로드에 실패했습니다.\n사유: ${errorMessage}`);
     }
   };
 

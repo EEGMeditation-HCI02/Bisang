@@ -1,15 +1,38 @@
-import { Settings } from 'lucide-react';
-import { motion } from 'motion/react';
-import { NavLink } from 'react-router-dom';
-import styles from './CSS/Header.module.css';
+import { motion } from "motion/react";
+import { NavLink } from "react-router-dom";
+import { useState } from "react";
+import { LogOut } from "lucide-react";
+import styles from "./CSS/Header.module.css";
+import GoogleLoginButton from "./GoogleLoginButton";
+import { useUser } from "../contexts/userContextHelpers";
+import { supabase } from "../lib/supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 const NAV_ITEMS = [
-  { label: 'Dashboard',  to: '/dashboard' },
-  { label: 'Meditation', to: '/meditationsetup' },
-  { label: 'Reports',    to: '/reports' },
+  { label: "Dashboard", to: "/dashboard" },
+  { label: "Meditation", to: "/meditationsetup" },
+  { label: "Reports", to: "/reports" },
+  { label: "Profile", to: "/profile" },
 ];
 
 export default function Header() {
+  const { user } = useUser();
+  const navigate = useNavigate();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  const handleLogout = async () => {
+    if (!supabase) return;
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    setIsDropdownOpen(false);
+    navigate("/");
+  };
+
   return (
     <nav className={styles.nav}>
       <div className={styles.container}>
@@ -28,7 +51,7 @@ export default function Header() {
               key={to}
               to={to}
               className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.navLinkActive : ''}`
+                `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
               }
             >
               {label}
@@ -37,19 +60,45 @@ export default function Header() {
         </div>
 
         <div className={styles.actions}>
-          <NavLink to="/meditationsetup" className={styles.startButton}>
-            <motion.div
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              Start Session
-            </motion.div>
-          </NavLink>
-          <NavLink to="/profile" className={styles.iconButtons}>
-             <button className={styles.iconButton}>
-              <Settings size={20} />
-            </button>
-          </NavLink>
+          {!user ? (
+            <GoogleLoginButton />
+          ) : (
+            <>
+              <div className={styles.profileDropdown}>
+                <button
+                  className={styles.profileButton}
+                  onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                >
+                  <div className={styles.userGreeting}>
+                    Hello,{" "}
+                    <span className={styles.userName}>{user.name}</span>
+                  </div>
+                  <img
+                    src={user.avatar_url || "/assets/default_profile.svg"}
+                    alt="profile"
+                    style={{
+                      width: "32px",
+                      height: "32px",
+                      borderRadius: "50%",
+                      objectFit: "cover",
+                    }}
+                  />
+                </button>
+
+                {isDropdownOpen && (
+                  <div className={styles.dropdownMenu}>
+                    <button
+                      className={styles.dropdownItem}
+                      onClick={handleLogout}
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </button>
+                  </div>
+                )}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </nav>
