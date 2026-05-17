@@ -198,7 +198,7 @@ export default function MeditationSetup() {
             </svg>
           </button>
         </div>
-      </main>
+      </main> 
     </div>
   );
 }
