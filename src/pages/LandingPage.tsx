@@ -21,8 +21,6 @@ function LandingPage() {
             cutting-edge neurotechnology. Enter the sanctuary.
           </div>
         </div>
-      </div>
-      <div className="landing-right">
         <div className="landing-auth-wrap">
           <div className="landing-auth-box">
             <GoogleLoginButton />
