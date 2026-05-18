@@ -8,6 +8,7 @@ export default function MeditationSession() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const durationMin = parseInt(searchParams.get('duration') || '3');
+  const theme = searchParams.get('theme') || 'free'; // 추가
   const ROUND_SECONDS = durationMin * 60;
 
   const [currentRound, setCurrentRound] = useState(1);
