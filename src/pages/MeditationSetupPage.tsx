@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import styles from "./css/MeditationSetupPage.module.css";
+
 const THEMES = [
   {
     id: "self-esteem",
@@ -88,9 +89,19 @@ const WAVEFORM_BARS = [
   { delay: "0.6s", height: 22 },
 ];
 
+const ROUNDS = 4;
+const SESSION_LENGTHS = [
+  { label: "3:00", minutes: 3 },
+  { label: "5:00", minutes: 5 },
+  { label: "10:00", minutes: 10 },
+];
+
 export default function MeditationSetup() {
   const navigate = useNavigate();
   const [selected, setSelected] = useState("relationships");
+  const [sessionMinutes, setSessionMinutes] = useState(3);
+
+  const totalMinutes = sessionMinutes * ROUNDS;
 
   return (
     <div className={styles.root}>
@@ -128,18 +139,39 @@ export default function MeditationSetup() {
               >
                 <div
                   className={styles.iconWrap}
-                  style={{
-                    background: theme.iconBg,
-                    color: theme.iconColor,
-                  }}
+                  style={{ background: theme.iconBg, color: theme.iconColor }}
                 >
                   {theme.icon}
                 </div>
                 <h3 className={styles.cardLabel}>{theme.label}</h3>
-                <p className={`${styles.cardDesc} ${isSelected ? styles.cardDescSelected : ""}`}>{theme.desc}</p>
+                <p className={`${styles.cardDesc} ${isSelected ? styles.cardDescSelected : ""}`}>
+                  {theme.desc}
+                </p>
               </div>
             );
           })}
+        </section>
+
+        {/* ── Session Length ── */}
+        <section className={styles.lengthSection}>
+          <h2 className={styles.lengthTitle}>Choose your session length</h2>
+          <p className={styles.lengthSub}>You'll go through {ROUNDS} rounds at this length</p>
+
+          <div className={styles.lengthBtns}>
+            {SESSION_LENGTHS.map(({ label, minutes }) => (
+              <button
+                key={minutes}
+                className={`${styles.lengthBtn} ${sessionMinutes === minutes ? styles.lengthBtnActive : ""}`}
+                onClick={() => setSessionMinutes(minutes)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <p className={styles.lengthSummary}>
+            {sessionMinutes} min × {ROUNDS} rounds — {totalMinutes} minutes in total
+          </p>
         </section>
 
         {/* ── AI Assistant ── */}
@@ -150,10 +182,7 @@ export default function MeditationSetup() {
               <div
                 key={i}
                 className={styles.waveBar}
-                style={{
-                  animationDelay: bar.delay,
-                  height: `${bar.height}px`,
-                }}
+                style={{ animationDelay: bar.delay, height: `${bar.height}px` }}
               />
             ))}
           </div>
@@ -162,14 +191,14 @@ export default function MeditationSetup() {
 
         {/* ── CTA ── */}
         <div className={styles.cta}>
-          <button className={styles.beginBtn} onClick={() => navigate('/meditation')}>
+          <button className={styles.beginBtn} onClick={() => navigate(`/meditation?duration=${sessionMinutes}&theme=${selected}`)}>
             Begin Session
             <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="20">
               <path d="M5 12h14m-7-7 7 7-7 7" />
             </svg>
           </button>
         </div>
-      </main>
+      </main> 
     </div>
   );
 }

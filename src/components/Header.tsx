@@ -63,6 +63,15 @@ export default function Header() {
         )}
 
         <div className={styles.actions}>
+          {/*<NavLink to="/meditationsetup" className={styles.startButton}>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              Start Session
+            </motion.div>
+          </NavLink>*/}
+
           {!user ? (
             <GoogleLoginButton />
           ) : (

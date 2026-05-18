@@ -1,5 +1,5 @@
 /* ============================================================
-   MeditationSession.module.css — BeeSang Design System
+   MeditationPage.module.css — BeeSang Design System
    ============================================================ */
 
 /* ---------- Design Tokens ---------- */
@@ -16,7 +16,6 @@
   --color-on-primary: #fff8f0;
 
   --color-secondary: #6b5d40;
-  --color-secondary-dim: #5f5235;
   --color-tertiary: #835431;
 
   --color-on-surface: #34322c;
@@ -37,20 +36,20 @@
 }
 
 /* ============================================================
-   ROOT — full-screen layout
+   ROOT — 정확히 100vh, 스크롤 없음
    ============================================================ */
 .root {
   font-family: var(--font-body);
   background-color: var(--color-bg);
   color: var(--color-on-surface);
-  min-height: 100vh;
+  width: 100%;
+  height: 100vh;           /* 딱 뷰포트 높이 */
+  overflow: hidden;        /* 세로 스크롤 차단 */
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 2rem 1.5rem;
   position: relative;
-  overflow: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -101,26 +100,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  transition:
-    background-color var(--transition-base),
-    transform var(--transition-base);
   z-index: 10;
+  transition: background-color var(--transition-base), transform var(--transition-base);
 }
 
-.backBtn:hover {
-  background: var(--color-surface-low);
-  transform: translateX(-2px);
-}
-
-.backBtn:active {
-  transform: scale(0.94);
-}
+.backBtn:hover { background: var(--color-surface-low); transform: translateX(-2px); }
+.backBtn:active { transform: scale(0.94); }
 
 @media (min-width: 768px) {
-  .backBtn {
-    left: 3rem;
-    top: 2.5rem;
-  }
+  .backBtn { left: 3rem; top: 2.5rem; }
 }
 
 /* ============================================================
@@ -128,7 +116,7 @@
    ============================================================ */
 .quote {
   position: absolute;
-  bottom: 5rem;
+  bottom: 3rem;
   right: 3rem;
   display: none;
   max-width: 18rem;
@@ -141,38 +129,93 @@
   pointer-events: none;
 }
 
-@media (min-width: 1024px) {
-  .quote {
-    display: block;
-  }
+@media (min-width: 1024px) { .quote { display: block; } }
+
+/* ============================================================
+   SESSION LAYOUT — [← 버튼] [카드] [→ 버튼]
+   ============================================================ */
+.sessionLayout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  width: 100%;
+  max-width: 62rem;
+  padding: 0 1.5rem;
+}
+
+/* ============================================================
+   SIDE BUTTONS (이전 / 다음 라운드)
+   ============================================================ */
+.sideBtn {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  width: 3.75rem;
+  padding: 1.125rem 0.5rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(182, 177, 168, 0.22);
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--color-primary);
+  cursor: pointer;
+  transition:
+    background-color 250ms ease,
+    box-shadow 250ms ease,
+    transform 250ms ease,
+    opacity 250ms ease;
+}
+
+.sideBtn:hover {
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 4px 18px rgba(117, 92, 28, 0.14);
+  transform: scale(1.07);
+}
+
+.sideBtn:active { transform: scale(0.94); }
+
+/* 비활성 라운드에서는 자리만 차지하고 숨김 */
+.sideBtnHidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sideBtnLabel {
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+  white-space: nowrap;
 }
 
 /* ============================================================
    CENTRAL CARD
    ============================================================ */
 .card {
-  position: relative;
-  z-index: 1;
-  width: 100%;
+  flex: 1;
+  min-width: 0;
   max-width: 38rem;
   background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(24px);
   -webkit-backdrop-filter: blur(24px);
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
-  padding: 3.5rem 3rem;
+  padding: 2.5rem 2.5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0;
   animation: fadeUp 0.7s ease both;
 }
 
 @media (min-width: 768px) {
-  .card {
-    padding: 5rem 5rem;
-  }
+  .card { padding: 3rem 4rem; }
 }
 
 /* ============================================================
@@ -182,13 +225,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 3.5rem;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
 }
 
 .title {
   font-family: var(--font-display);
-  font-size: clamp(2.75rem, 7vw, 3.75rem);
+  font-size: clamp(2.25rem, 5vw, 3.25rem);
   font-weight: 300;
   color: var(--color-primary);
   letter-spacing: -0.03em;
@@ -199,10 +242,8 @@
   display: flex;
   align-items: center;
   gap: 0.625rem;
-  justify-content: center;
 }
 
-/* Pulse dot */
 .pulseDot {
   position: relative;
   display: inline-flex;
@@ -238,6 +279,39 @@
 }
 
 /* ============================================================
+   ROUND INDICATOR
+   ============================================================ */
+.roundIndicator {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.roundDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: background-color 350ms ease, transform 350ms ease, box-shadow 350ms ease;
+}
+
+.roundDotDone    { background: var(--color-primary); opacity: 0.35; }
+.roundDotActive  { background: var(--color-primary); transform: scale(1.7); box-shadow: 0 0 6px rgba(117, 92, 28, 0.45); cursor: default; }
+.roundDotPending { background: var(--color-surface-high); }
+
+.roundLabel {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-on-surface-variant);
+  margin-left: 0.375rem;
+}
+
+/* ============================================================
    ORB
    ============================================================ */
 .orbWrap {
@@ -245,15 +319,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 20rem;
-  height: 20rem;
-  margin-bottom: 3.5rem;
+  width: 14rem;
+  height: 14rem;
+  margin-bottom: 1.5rem;
 }
 
 .ringOuter {
   position: absolute;
-  width: 16rem;
-  height: 16rem;
+  width: 11rem;
+  height: 11rem;
   border-radius: var(--radius-full);
   border: 1px solid rgba(117, 92, 28, 0.1);
   animation: pulseSlow 4s ease-in-out infinite;
@@ -261,16 +335,16 @@
 
 .ringInner {
   position: absolute;
-  width: 20rem;
-  height: 20rem;
+  width: 14rem;
+  height: 14rem;
   border-radius: var(--radius-full);
   border: 1px solid rgba(117, 92, 28, 0.05);
   animation: pulseSlow 6s ease-in-out infinite;
 }
 
 .orb {
-  width: 12rem;
-  height: 12rem;
+  width: 8.5rem;
+  height: 8.5rem;
   border-radius: var(--radius-full);
   background: radial-gradient(circle at 30% 30%, #ffdc8f, #fdbf93 40%, #755c1c 80%);
   box-shadow: var(--shadow-orb);
@@ -290,17 +364,23 @@
   filter: blur(18px);
 }
 
+/* 완료 상태 */
+.orbFinished {
+  background: radial-gradient(circle at 30% 30%, #d4edda, #a8d5b5 40%, #4a8c62 80%) !important;
+  box-shadow: 0 0 60px rgba(74, 140, 98, 0.25), inset -10px -10px 30px rgba(74, 140, 98, 0.3) !important;
+}
+
 /* ============================================================
    SUBTITLE
    ============================================================ */
 .subtitle {
   font-family: var(--font-display);
   font-style: italic;
-  font-size: 1.375rem;
+  font-size: 1.125rem;
   font-weight: 300;
   color: var(--color-secondary);
   opacity: 0.78;
-  margin-bottom: 3.5rem;
+  margin-bottom: 1.5rem;
 }
 
 /* ============================================================
@@ -311,7 +391,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.25rem;
+  gap: 1rem;
 }
 
 .timerDisplay {
@@ -319,29 +399,19 @@
   align-items: baseline;
   gap: 0.5rem;
   font-family: var(--font-body);
-  font-size: 1.5rem;
+  font-size: 1.375rem;
   letter-spacing: 0.08em;
   color: rgba(117, 92, 28, 0.8);
 }
 
-.timerElapsed {
-  font-weight: 600;
-}
+.timerElapsed  { font-weight: 600; }
+.timerDivider  { opacity: 0.3; font-weight: 300; }
+.timerTotal    { opacity: 0.45; font-weight: 300; }
 
-.timerDivider {
-  opacity: 0.3;
-  font-weight: 300;
-}
-
-.timerTotal {
-  opacity: 0.45;
-  font-weight: 300;
-}
-
-/* ---------- Progress Bar ---------- */
+/* ── Progress Bar ── */
 .progressBar {
   width: 100%;
-  max-width: 20rem;
+  max-width: 18rem;
   height: 3px;
   background: var(--color-surface-high);
   border-radius: var(--radius-full);
@@ -356,12 +426,12 @@
   transition: width 1s linear;
 }
 
-/* ---------- Controls ---------- */
+/* ── Controls ── */
 .controls {
   display: flex;
   align-items: center;
   gap: 2rem;
-  margin-top: 0.75rem;
+  margin-top: 0.5rem;
 }
 
 .controlBtn {
@@ -374,23 +444,15 @@
   justify-content: center;
   padding: 0.375rem;
   border-radius: var(--radius-full);
-  transition:
-    color var(--transition-base),
-    transform var(--transition-base);
+  transition: color var(--transition-base), transform var(--transition-base);
 }
 
-.controlBtn:hover {
-  color: var(--color-primary);
-  transform: scale(1.1);
-}
-
-.controlBtn:active {
-  transform: scale(0.92);
-}
+.controlBtn:hover  { color: var(--color-primary); transform: scale(1.1); }
+.controlBtn:active { transform: scale(0.92); }
 
 .playPauseBtn {
-  width: 4rem;
-  height: 4rem;
+  width: 3.75rem;
+  height: 3.75rem;
   border-radius: var(--radius-full);
   background: var(--color-primary);
   color: var(--color-on-primary);
@@ -400,62 +462,307 @@
   align-items: center;
   justify-content: center;
   box-shadow: var(--shadow-play);
-  transition:
-    transform var(--transition-base),
-    box-shadow var(--transition-base),
-    background-color var(--transition-base);
+  transition: transform var(--transition-base), box-shadow var(--transition-base);
 }
 
-.playPauseBtn:hover {
-  transform: scale(1.07);
-  box-shadow: 0 12px 40px rgba(117, 92, 28, 0.36);
+.playPauseBtn:hover  { transform: scale(1.07); box-shadow: 0 12px 40px rgba(117, 92, 28, 0.36); }
+.playPauseBtn:active { transform: scale(0.95); }
+
+/* ── Finish Button ── */
+.finishBtn {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-full);
+  padding: 0.875rem 2.5rem;
+  margin-top: 0.5rem;
+  box-shadow: 0 8px 24px rgba(117, 92, 28, 0.22);
+  transition: background-color 300ms ease, transform 300ms ease, box-shadow 300ms ease;
 }
 
-.playPauseBtn:active {
-  transform: scale(0.95);
-}
+.finishBtn:hover  { background: var(--color-primary-dim); box-shadow: 0 12px 32px rgba(117, 92, 28, 0.32); }
+.finishBtn:active { transform: scale(0.96); }
 
 /* ============================================================
    KEYFRAMES
    ============================================================ */
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(28px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes ping {
-  75%, 100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
+  75%, 100% { transform: scale(2.2); opacity: 0; }
 }
 
 @keyframes pulseSlow {
-  0%, 100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.5;
-    transform: scale(1.04);
-  }
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(1.04); }
 }
 
 @keyframes breathe {
-  0%, 100% {
-    transform: scale(1);
-    box-shadow: var(--shadow-orb);
-  }
-  50% {
-    transform: scale(1.06);
-    box-shadow: 0 0 90px rgba(117, 92, 28, 0.28), inset -10px -10px 40px rgba(117, 92, 28, 0.35);
-  }
+  0%, 100% { transform: scale(1);    box-shadow: var(--shadow-orb); }
+  50%       { transform: scale(1.06); box-shadow: 0 0 90px rgba(117, 92, 28, 0.28), inset -10px -10px 40px rgba(117, 92, 28, 0.35); }
+}
+
+/* ============================================================
+   MUSIC TOGGLE BUTTON (우상단)
+   ============================================================ */
+.musicToggleBtn {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(182, 177, 168, 0.2);
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  color: var(--color-primary);
+  font-family: var(--font-body);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+}
+
+.musicToggleBtn:hover {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 16px rgba(117, 92, 28, 0.12);
+  transform: translateY(-1px);
+}
+
+@media (min-width: 768px) {
+  .musicToggleBtn { top: 2.5rem; right: 3rem; }
+}
+
+/* ============================================================
+   MUSIC PANEL (우측 슬라이드인)
+   ============================================================ */
+.musicPanel {
+  position: absolute;
+  top: 5.5rem;
+  right: 2rem;
+  z-index: 30;
+  width: 22rem;
+  max-height: calc(100vh - 8rem);
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(182, 177, 168, 0.2);
+  border-radius: 1.5rem;
+  box-shadow: 0 16px 48px rgba(52, 50, 44, 0.12);
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  animation: fadeUp 0.25s ease both;
+}
+
+@media (min-width: 768px) {
+  .musicPanel { right: 3rem; top: 6rem; }
+}
+
+/* 패널 헤더 */
+.musicPanelHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.musicPanelTitle {
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--color-on-surface);
+  letter-spacing: -0.01em;
+}
+
+/* 볼륨 */
+.volumeRow {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.volumeSlider {
+  width: 5rem;
+  height: 3px;
+  accent-color: var(--color-primary);
+  cursor: pointer;
+}
+
+/* ── 재생 중 바 ── */
+.nowPlaying {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  background: rgba(255, 220, 143, 0.25);
+  border-radius: 0.875rem;
+  border: 1px solid rgba(117, 92, 28, 0.12);
+}
+
+.nowPlayingInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.nowPlayingDot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: var(--radius-full);
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.nowPlayingDot[data-playing="true"] {
+  animation: ping 1.2s ease infinite;
+}
+
+.nowPlayingName {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nowPlayingControls {
+  display: flex;
+  gap: 0.375rem;
+  flex-shrink: 0;
+}
+
+.musicCtrlBtn {
+  width: 1.875rem;
+  height: 1.875rem;
+  border-radius: var(--radius-full);
+  border: none;
+  background: rgba(117, 92, 28, 0.1);
+  color: var(--color-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color var(--transition-base), transform var(--transition-base);
+}
+
+.musicCtrlBtn:hover  { background: rgba(117, 92, 28, 0.18); transform: scale(1.08); }
+.musicCtrlBtn:active { transform: scale(0.93); }
+
+/* ── Sound List ── */
+.soundList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.soundStatus {
+  padding: 1rem 0;
+  text-align: center;
+}
+
+.loadingDots {
+  font-size: 0.8125rem;
+  color: var(--color-on-surface-variant);
+}
+
+.loadingDots::after {
+  content: "...";
+  animation: dots 1.4s steps(4, end) infinite;
+}
+
+.errorText {
+  font-size: 0.8125rem;
+  color: #a73b21;
+}
+
+.soundItem {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.875rem;
+  border: 1px solid transparent;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color var(--transition-base), border-color var(--transition-base);
+}
+
+.soundItem:hover { background: rgba(117, 92, 28, 0.06); }
+
+.soundItemActive {
+  background: rgba(255, 220, 143, 0.2);
+  border-color: rgba(117, 92, 28, 0.15);
+}
+
+.soundItemLeft {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.soundItemPlay {
+  width: 1.375rem;
+  height: 1.375rem;
+  border-radius: var(--radius-full);
+  background: rgba(117, 92, 28, 0.08);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.soundItemName {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.soundItemMeta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.125rem;
+  flex-shrink: 0;
+  font-size: 0.6875rem;
+  color: var(--color-on-surface-variant);
+  opacity: 0.7;
+}
+
+/* ── Loading dots animation ── */
+@keyframes dots {
+  0%  { content: ""; }
+  25% { content: "."; }
+  50% { content: ".."; }
+  75% { content: "..."; }
 }
 
 /* ============================================================
