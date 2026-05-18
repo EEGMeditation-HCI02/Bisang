@@ -21,12 +21,12 @@ interface FreesoundResponse {
 // 명상 테마별 Freesound 검색어
 // ─────────────────────────────────────────────
 const THEME_QUERIES: Record<string, { label: string; query: string; emoji: string }> = {
-  "self-esteem": { label: "Self-esteem", query: "peaceful piano meditation ambient",     emoji: "💛" },
-  relationships:  { label: "Relationships", query: "soft guitar meditation calm ambient", emoji: "🤝" },
-  rest:           { label: "Rest",          query: "sleep relaxation ambient nature",     emoji: "🌙" },
-  focus:          { label: "Focus",         query: "binaural focus concentration ambient",emoji: "🎯" },
-  calm:           { label: "Calm",          query: "rain forest nature ambient meditation",emoji: "🌿" },
-  free:           { label: "Free",          query: "ambient meditation nature soundscape",emoji: "✨" },
+  "self-esteem": { label: "Self-esteem", query: "peaceful piano meditation ambient",     emoji: "Self-esteem" },
+  relationships:  { label: "Relationships", query: "soft guitar meditation calm ambient", emoji: "Relationships" },
+  rest:           { label: "Rest",          query: "sleep relaxation ambient nature",     emoji: "Rest" },
+  focus:          { label: "Focus",         query: "binaural focus concentration ambient",emoji: "Focus" },
+  calm:           { label: "Calm",          query: "rain forest nature ambient meditation",emoji: "Calm" },
+  free:           { label: "Free",          query: "ambient meditation nature soundscape",emoji: "Free" },
 };
 
 const DEFAULT_THEME = "calm";
