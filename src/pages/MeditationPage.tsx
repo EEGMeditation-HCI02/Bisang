@@ -396,7 +396,7 @@ export default function MeditationSession() {
                     <text x="8.5" y="15.5" fontSize="5.5" fontFamily="sans-serif" fontWeight="bold" fill="currentColor">10</text>
                   </svg>
                 </button>
-                <button className={styles.playPauseBtn} onClick={() => setIsPlaying((p) => !p)}>
+                <button className={styles.playPauseBtn} onClick={() => setIsPlaying((p) => !p)}> 
                   {isPlaying
                     ? <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
                     : <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
