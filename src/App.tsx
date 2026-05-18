@@ -8,7 +8,6 @@ import MeditationPage from "./pages/MeditationPage";
 import MeditationSetupPage from "./pages/MeditationSetupPage";
 import TestGuidePage from "./pages/TestGuidePage";
 import UserSettingPage from "./pages/UserSettingPage";
-import SettingGuidePage from "./pages/SettingGuidePage";
 import ProfilePage from "./pages/ProfilePage";
 
 import GoogleLoginButton from "./components/GoogleLoginButton";
@@ -49,7 +48,6 @@ function App() {
             <Route path="/meditationsetup" element={<MeditationSetupPage />} />
             <Route path="/testguide" element={<TestGuidePage />} />
             <Route path="/usersetting" element={<UserSettingPage />} />
-            <Route path="/settingguide" element={<SettingGuidePage />} />
             <Route path="/profile" element={<ProfilePage />} />
           </Routes>
         </Layout>

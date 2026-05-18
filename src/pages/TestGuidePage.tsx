@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 import styles from "./css/TestGuidePage.module.css";
 
 // MindWaveParser 클래스
@@ -170,6 +172,8 @@ function BrainIcon() {
 
 export default function TestGuidePage() {
   type ConnectionStatus = "disconnected" | "connecting" | "connected";
+  
+  const navigate = useNavigate();
 
   const [connectionStatus, setConnectionStatus] =
     useState<ConnectionStatus>("disconnected");
@@ -181,6 +185,13 @@ export default function TestGuidePage() {
     poorSignal: 200,
     eegPower: null as Record<string, number> | null,
   });
+  const [chartData, setChartData] = useState<Array<{ time: string; attention: number; meditation: number }>>(
+    Array(50).fill(null).map((_, i) => ({ 
+      time: `${i}s`, 
+      attention: 0, 
+      meditation: 0 
+    }))
+  );
 
   const parserRef = useRef<MindWaveParser | null>(null);
   const portRef = useRef<{
@@ -192,16 +203,32 @@ export default function TestGuidePage() {
     null,
   );
   const mockIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const dataCountRef = useRef(0);
 
   useEffect(() => {
     parserRef.current = new MindWaveParser();
     parserRef.current.onData = (data: Record<string, unknown>) => {
+      const attention = (data.attention as number) ?? 0;
+      const meditation = (data.meditation as number) ?? 0;
+      
       setMindwaveData((prev) => ({
-        attention: (data.attention as number) ?? prev.attention,
-        meditation: (data.meditation as number) ?? prev.meditation,
+        attention,
+        meditation,
         poorSignal: (data.poorSignal as number) ?? prev.poorSignal,
         eegPower: (data.eegPower as Record<string, number>) ?? prev.eegPower,
       }));
+
+      // Update chart data
+      setChartData((prev) => {
+        const newData = [...prev.slice(1)];
+        dataCountRef.current += 1;
+        newData.push({
+          time: `${dataCountRef.current * 0.5}s`,
+          attention,
+          meditation,
+        });
+        return newData;
+      });
     };
 
     return () => {
@@ -210,6 +237,17 @@ export default function TestGuidePage() {
       if (portRef.current) portRef.current.close();
     };
   }, []);
+
+  // 연결 완료 후 MeditationSetupPage로 이동
+  useEffect(() => {
+    if (connectionStatus === "connected") {
+      const timer = setTimeout(() => {
+        navigate("/meditationsetup");
+      }, 2000); // 2초 후 이동
+
+      return () => clearTimeout(timer);
+    }
+  }, [connectionStatus, navigate]);
 
   const handleConnect = async () => {
     if (connectionStatus === "connected") {
@@ -364,7 +402,7 @@ export default function TestGuidePage() {
               ? "Connected to MindWave"
               : connectionStatus === "connecting"
                 ? "Connecting..."
-                : "Ready to Connect"}
+                : "Connect a device"}
           </h1>
           <p className={styles.subtitle}>
             {connectionStatus === "connected"
@@ -390,6 +428,47 @@ export default function TestGuidePage() {
             {connectionStatus === "connected" ? "Active" : "Idle"}
           </div>
         </div>
+
+        {/* Chart */}
+        {(loading || connectionStatus === "connected" || isMocking) && (
+          <div className={styles.chartContainer}>
+            <h2 className={styles.chartTitle}>Brain Activity</h2>
+            <ResponsiveContainer width="100%" height={200}>
+              <LineChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke="rgba(117, 92, 28, 0.1)" />
+                <XAxis dataKey="time" stroke="rgba(117, 92, 28, 0.5)" height={20} />
+                <YAxis stroke="rgba(117, 92, 28, 0.5)" domain={[0, 100]} width={35} />
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "rgba(254, 249, 243, 0.95)",
+                    border: "1px solid rgba(117, 92, 28, 0.2)",
+                    borderRadius: "8px",
+                  }}
+                  labelStyle={{ color: "rgba(117, 92, 28, 0.8)" }}
+                />
+                <Legend />
+                <Line
+                  type="monotone"
+                  dataKey="attention"
+                  stroke="#755C1C"
+                  dot={false}
+                  strokeWidth={2}
+                  isAnimationActive={false}
+                  name="Attention"
+                />
+                <Line
+                  type="monotone"
+                  dataKey="meditation"
+                  stroke="#FFB84D"
+                  dot={false}
+                  strokeWidth={2}
+                  isAnimationActive={false}
+                  name="Meditation"
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        )}
 
         {/* Status Cards */}
         <div className={styles.statusGrid}>

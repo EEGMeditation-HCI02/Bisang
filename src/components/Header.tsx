@@ -10,9 +10,10 @@ import { useNavigate } from "react-router-dom";
 
 const NAV_ITEMS = [
   { label: "Dashboard", to: "/dashboard" },
-  { label: "Meditation", to: "/meditationsetup" },
+  { label: "Meditation", to: "/testguide" },
   { label: "Reports", to: "/reports" },
   { label: "Profile", to: "/profile" },
+  { label: "How to wear", to: "/howtoguide" },
 ];
 
 export default function Header() {
@@ -45,19 +46,21 @@ export default function Header() {
           </motion.div>
         </NavLink>
 
-        <div className={styles.navLinks}>
-          {NAV_ITEMS.map(({ label, to }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) =>
-                `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
-              }
-            >
-              {label}
-            </NavLink>
-          ))}
-        </div>
+        {user && (
+          <div className={styles.navLinks}>
+            {NAV_ITEMS.map(({ label, to }) => (
+              <NavLink
+                key={to}
+                to={to}
+                className={({ isActive }) =>
+                  `${styles.navLink} ${isActive ? styles.navLinkActive : ""}`
+                }
+              >
+                {label}
+              </NavLink>
+            ))}
+          </div>
+        )}
 
         <div className={styles.actions}>
           {!user ? (
@@ -70,8 +73,7 @@ export default function Header() {
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
                 >
                   <div className={styles.userGreeting}>
-                    Hello,{" "}
-                    <span className={styles.userName}>{user.name}</span>
+                    Hello, <span className={styles.userName}>{user.name}</span>
                   </div>
                   <img
                     src={user.avatar_url || "/assets/default_profile.svg"}
