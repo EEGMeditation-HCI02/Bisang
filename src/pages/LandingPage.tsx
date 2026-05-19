@@ -9,28 +9,34 @@ function LandingPage() {
   const sectionsRef = useRef<HTMLDivElement[]>([]);
 
   useEffect(() => {
-    const observerOptions = {
-      threshold: 0.1,
-      rootMargin: "0px 0px -50px 0px",
-    };
+    // ✅ ref를 로컬 변수에 복사
+    const currentSections = sectionsRef.current;
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("animate-in");
-          observer.unobserve(entry.target);
-        }
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add("fade-in-visible");
+          }
+        });
+      },
+      { threshold: 0.1 },
+    );
+
+    // 모든 section 관찰
+    if (currentSections) {
+      currentSections.forEach((section) => {
+        if (section) observer.observe(section);
       });
-    }, observerOptions);
+    }
 
-    sectionsRef.current.forEach((section) => {
-      if (section) observer.observe(section);
-    });
-
+    // ✅ cleanup에서 로컬 변수 사용
     return () => {
-      sectionsRef.current.forEach((section) => {
-        if (section) observer.unobserve(section);
-      });
+      if (currentSections) {
+        currentSections.forEach((section) => {
+          if (section) observer.unobserve(section);
+        });
+      }
     };
   }, []);
 
