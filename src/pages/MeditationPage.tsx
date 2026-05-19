@@ -123,7 +123,7 @@ export default function MeditationSession() {
 
   // ── Motion tracking for stability guidance ──
   const [isUnstable, setIsUnstable] = useState(false);
-  const motionResetRef = useRef<NodeJS.Timeout | null>(null);
+  const motionResetRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const motionCountRef = useRef(0);
 
   // ── Brainwave metrics ──
