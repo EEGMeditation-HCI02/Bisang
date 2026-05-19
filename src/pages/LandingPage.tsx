@@ -16,7 +16,7 @@ function LandingPage() {
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
-            entry.target.classList.add("fade-in-visible");
+            entry.target.classList.add("animate-in");
           }
         });
       },
