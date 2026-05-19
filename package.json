@@ -7,7 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "brainwave-server": "node brainwave-server.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.105.3",
@@ -19,7 +20,8 @@
     "recharts": "^3.8.1",
     "styled-components": "^6.4.1",
     "supabase": "^2.98.0",
-    "supabase-js": "^0.0.1-security"
+    "supabase-js": "^0.0.1-security",
+    "ws": "^8.20.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

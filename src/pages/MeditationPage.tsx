@@ -1,6 +1,12 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./css/MeditationPage.module.css";
+import {
+  generateMeditationGuidances,
+  STABILITY_GUIDANCES,
+  assessBrainwaveState,
+  type BrainwaveMetrics,
+} from "../hooks/useMeditationLLM";
 
 // ─────────────────────────────────────────────
 // Types
@@ -20,13 +26,40 @@ interface FreesoundResponse {
 // ─────────────────────────────────────────────
 // 명상 테마별 Freesound 검색어
 // ─────────────────────────────────────────────
-const THEME_QUERIES: Record<string, { label: string; query: string; emoji: string }> = {
-  "self-esteem": { label: "Self-esteem", query: "peaceful piano meditation ambient",     emoji: "Self-esteem" },
-  relationships:  { label: "Relationships", query: "soft guitar meditation calm ambient", emoji: "Relationships" },
-  rest:           { label: "Rest",          query: "sleep relaxation ambient nature",     emoji: "Rest" },
-  focus:          { label: "Focus",         query: "binaural focus concentration ambient",emoji: "Focus" },
-  calm:           { label: "Calm",          query: "rain forest nature ambient meditation",emoji: "Calm" },
-  free:           { label: "Free",          query: "ambient meditation nature soundscape",emoji: "Free" },
+const THEME_QUERIES: Record<
+  string,
+  { label: string; query: string; emoji: string }
+> = {
+  "self-esteem": {
+    label: "Self-esteem",
+    query: "peaceful piano meditation ambient",
+    emoji: "Self-esteem",
+  },
+  relationships: {
+    label: "Relationships",
+    query: "soft guitar meditation calm ambient",
+    emoji: "Relationships",
+  },
+  rest: {
+    label: "Rest",
+    query: "sleep relaxation ambient nature",
+    emoji: "Rest",
+  },
+  focus: {
+    label: "Focus",
+    query: "binaural focus concentration ambient",
+    emoji: "Focus",
+  },
+  calm: {
+    label: "Calm",
+    query: "rain forest nature ambient meditation",
+    emoji: "Calm",
+  },
+  free: {
+    label: "Free",
+    query: "ambient meditation nature soundscape",
+    emoji: "Free",
+  },
 };
 
 const DEFAULT_THEME = "calm";
@@ -61,50 +94,227 @@ export default function MeditationSession() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
-  const durationMin   = parseInt(searchParams.get("duration") || "3");
-  const theme         = searchParams.get("theme") || DEFAULT_THEME;
+  const durationMin = parseInt(searchParams.get("duration") || "3");
+  const theme = searchParams.get("theme") || DEFAULT_THEME;
   const ROUND_SECONDS = durationMin * 60;
 
   // ── Timer state ──
   const [currentRound, setCurrentRound] = useState(1);
-  const [elapsed,      setElapsed]      = useState(0);
-  const [isPlaying,    setIsPlaying]    = useState(true);
-  const [isFinished,   setIsFinished]   = useState(false);
+  const [elapsed, setElapsed] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [isFinished, setIsFinished] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // ── Music state ──
-  const [sounds,       setSounds]       = useState<FreesoundSound[]>([]);
-  const [soundLoading, setSoundLoading] = useState(false);
-  const [soundError,   setSoundError]   = useState("");
+  const [sounds, setSounds] = useState<FreesoundSound[]>([]);
+  const [soundError, setSoundError] = useState("");
   const [currentSound, setCurrentSound] = useState<FreesoundSound | null>(null);
   const [musicPlaying, setMusicPlaying] = useState(false);
-  const [volume,       setVolume]       = useState(0.6);
+  const [volume, setVolume] = useState(0.6);
   const [showMusicPanel, setShowMusicPanel] = useState(false);
 
+  // ── Meditation Guide state ──
+  const [guidances, setGuidances] = useState<string[]>([]);
+  const [guidanceIndex, setGuidanceIndex] = useState(0);
+  const [guidanceLoading, setGuidanceLoading] = useState(true);
+  const guidanceIntervalRef = useRef<ReturnType<typeof setInterval> | null>(
+    null,
+  );
+
+  // ── Motion tracking for stability guidance ──
+  const [isUnstable, setIsUnstable] = useState(false);
+  const motionResetRef = useRef<NodeJS.Timeout | null>(null);
+  const motionCountRef = useRef(0);
+
+  // ── Brainwave metrics ──
+  const [brainwaveMetrics, setBrainwaveMetrics] = useState<BrainwaveMetrics>({
+    attention: 0,
+    meditation: 0,
+    signal: 200,
+  });
+  const [brainwaveState, setBrainwaveState] = useState<
+    "focused" | "stable" | "unstable"
+  >("stable");
+  const [brainwaveConnected, setBrainwaveConnected] = useState(false);
+  const wsRef = useRef<WebSocket | null>(null);
+
   // ✅ useRef는 반드시 컴포넌트 최상위에서 선언
-  const audioRef    = useRef<HTMLAudioElement | null>(null);
-  const autoPlayed  = useRef(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const autoPlayed = useRef(false);
+
+  // ─────────────────────────────────────────────
+  // 명상 멘트 로드 및 회전 (3초마다)
+  // ─────────────────────────────────────────────
+  useEffect(() => {
+    let isMounted = true;
+
+    const loadGuidances = async () => {
+      setGuidanceLoading(true);
+      try {
+        const loadedGuidances = await generateMeditationGuidances(theme);
+        if (isMounted) {
+          setGuidances(loadedGuidances);
+          setGuidanceIndex(0);
+          setGuidanceLoading(false);
+        }
+      } catch (err) {
+        console.error("멘트 로드 실패:", err);
+        if (isMounted) {
+          setGuidances([]);
+          setGuidanceLoading(false);
+        }
+      }
+    };
+
+    loadGuidances();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [theme]);
+
+  // ─────────────────────────────────────────────
+  // 멘트 회전 타이머
+  // ─────────────────────────────────────────────
+  useEffect(() => {
+    if (guidances.length === 0 || guidanceLoading) return;
+
+    if (guidanceIntervalRef.current) clearInterval(guidanceIntervalRef.current);
+
+    guidanceIntervalRef.current = setInterval(() => {
+      setGuidanceIndex((prev) => (prev + 1) % guidances.length);
+    }, 3000);
+
+    return () => {
+      if (guidanceIntervalRef.current)
+        clearInterval(guidanceIntervalRef.current);
+    };
+  }, [guidances, guidanceLoading]);
+
+  // ─────────────────────────────────────────────
+  // 사용자 움직임 감지 및 안정성 가이드
+  // ─────────────────────────────────────────────
+  useEffect(() => {
+    const handleMotion = () => {
+      motionCountRef.current += 1;
+
+      // 움직임이 많으면 불안정 상태 활성화
+      if (motionCountRef.current > 3) {
+        setIsUnstable(true);
+      }
+
+      // 기존 타이머 초기화
+      if (motionResetRef.current) clearTimeout(motionResetRef.current);
+
+      // 5초 동안 움직임이 없으면 리셋
+      motionResetRef.current = setTimeout(() => {
+        motionCountRef.current = 0;
+        setIsUnstable(false);
+      }, 5000);
+    };
+
+    window.addEventListener("mousemove", handleMotion);
+    window.addEventListener("touchmove", handleMotion);
+
+    return () => {
+      window.removeEventListener("mousemove", handleMotion);
+      window.removeEventListener("touchmove", handleMotion);
+      if (motionResetRef.current) clearTimeout(motionResetRef.current);
+    };
+  }, []);
+
+  // ─────────────────────────────────────────────
+  // Brainwave WebSocket 연결
+  // ─────────────────────────────────────────────
+  useEffect(() => {
+    let isMounted = true;
+
+    const connectBrainwave = () => {
+      try {
+        // localhost:8080에서 MindWave 데이터 수신
+        const ws = new WebSocket("ws://localhost:8080");
+
+        ws.onopen = () => {
+          console.log("🧠 뇌파 센서 연결됨");
+          if (isMounted) setBrainwaveConnected(true);
+        };
+
+        ws.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (isMounted) {
+              setBrainwaveMetrics({
+                attention: data.attention || 0,
+                meditation: data.meditation || 0,
+                signal: data.signal || 200,
+              });
+              // 뇌파 상태 업데이트
+              const newState = assessBrainwaveState({
+                attention: data.attention || 0,
+                meditation: data.meditation || 0,
+                signal: data.signal || 200,
+              });
+              setBrainwaveState(newState);
+              console.log(
+                `🧠 뇌파 업데이트 - Attention: ${data.attention}, Meditation: ${data.meditation}, State: ${newState}`,
+              );
+            }
+          } catch (err) {
+            console.error("뇌파 데이터 파싱 실패:", err);
+          }
+        };
+
+        ws.onerror = (err) => {
+          console.warn("🧠 뇌파 센서 연결 오류:", err);
+          if (isMounted) setBrainwaveConnected(false);
+        };
+
+        ws.onclose = () => {
+          console.log("🧠 뇌파 센서 연결 끊김");
+          if (isMounted) setBrainwaveConnected(false);
+          // 3초 후 재연결 시도
+          setTimeout(() => {
+            if (isMounted) connectBrainwave();
+          }, 3000);
+        };
+
+        wsRef.current = ws;
+      } catch (err) {
+        console.error("뇌파 연결 실패:", err);
+        if (isMounted) setBrainwaveConnected(false);
+      }
+    };
+
+    connectBrainwave();
+
+    return () => {
+      isMounted = false;
+      if (wsRef.current) {
+        wsRef.current.close();
+      }
+    };
+  }, []);
 
   // ─────────────────────────────────────────────
   // Audio element 초기화
   // ─────────────────────────────────────────────
   useEffect(() => {
-    const audio  = new Audio();
-    audio.loop   = true;
+    const audio = new Audio();
+    audio.loop = true;
     audio.volume = volume;
     audioRef.current = audio;
 
-    const onPlay  = () => setMusicPlaying(true);
+    const onPlay = () => setMusicPlaying(true);
     const onPause = () => setMusicPlaying(false);
-    audio.addEventListener("play",  onPlay);
+    audio.addEventListener("play", onPlay);
     audio.addEventListener("pause", onPause);
 
     return () => {
       audio.pause();
-      audio.removeEventListener("play",  onPlay);
+      audio.removeEventListener("play", onPlay);
       audio.removeEventListener("pause", onPause);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -115,31 +325,43 @@ export default function MeditationSession() {
   // Freesound 로드 + 첫 곡 자동재생
   // ─────────────────────────────────────────────
   useEffect(() => {
-    const themeInfo = THEME_QUERIES[theme] ?? THEME_QUERIES[DEFAULT_THEME];
-    setSoundLoading(true);
-    setSoundError("");
-    setSounds([]);
-    autoPlayed.current = false; // 테마 바뀌면 리셋
+    let isMounted = true;
 
-    fetchSounds(themeInfo.query)
-      .then((results) => {
-        setSounds(results);
-        // ✅ 첫 번째 곡 자동재생 (한 번만)
-        if (results.length > 0 && !autoPlayed.current) {
-          autoPlayed.current = true;
-          const first = results[0];
-          setCurrentSound(first);
-          setTimeout(() => {
-            const audio = audioRef.current;
-            if (!audio) return;
-            audio.src  = first.previews["preview-hq-mp3"];
-            audio.loop = true;
-            audio.play().catch((e) => console.warn("Auto-play blocked:", e));
-          }, 100);
+    const loadSounds = async () => {
+      setSounds([]);
+      setSoundError("");
+      const themeInfo = THEME_QUERIES[theme] ?? THEME_QUERIES[DEFAULT_THEME];
+      try {
+        const results = await fetchSounds(themeInfo.query);
+        if (isMounted) {
+          setSounds(results);
+          // ✅ 첫 번째 곡 자동재생 (한 번만)
+          if (results.length > 0 && !autoPlayed.current) {
+            autoPlayed.current = true;
+            const first = results[0];
+            setCurrentSound(first);
+            setTimeout(() => {
+              const audio = audioRef.current;
+              if (!audio) return;
+              audio.src = first.previews["preview-hq-mp3"];
+              audio.loop = true;
+              audio.play().catch((e) => console.warn("Auto-play blocked:", e));
+            }, 100);
+          }
         }
-      })
-      .catch((e: Error) => setSoundError(e.message))
-      .finally(() => setSoundLoading(false));
+      } catch (e: Error | unknown) {
+        if (isMounted) {
+          setSoundError(e instanceof Error ? e.message : "오류 발생");
+        }
+      }
+    };
+
+    autoPlayed.current = false;
+    loadSounds();
+
+    return () => {
+      isMounted = false;
+    };
   }, [theme]);
 
   // ─────────────────────────────────────────────
@@ -154,7 +376,10 @@ export default function MeditationSession() {
           if (next >= ROUND_SECONDS) {
             clearInterval(intervalRef.current!);
             if (currentRound < TOTAL_ROUNDS) {
-              setTimeout(() => { setCurrentRound((r) => r + 1); setElapsed(0); }, 800);
+              setTimeout(() => {
+                setCurrentRound((r) => r + 1);
+                setElapsed(0);
+              }, 800);
             } else {
               setIsFinished(true);
             }
@@ -166,7 +391,9 @@ export default function MeditationSession() {
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current);
     }
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [isPlaying, currentRound, ROUND_SECONDS, isFinished]);
 
   // ─────────────────────────────────────────────
@@ -176,16 +403,24 @@ export default function MeditationSession() {
     const audio = audioRef.current;
     if (!audio) return;
     audio.pause();
-    audio.src  = sound.previews["preview-hq-mp3"];
+    audio.src = sound.previews["preview-hq-mp3"];
     audio.loop = true;
     setCurrentSound(sound);
-    try { await audio.play(); } catch (e) { console.error("Playback failed", e); }
+    try {
+      await audio.play();
+    } catch (e) {
+      console.error("Playback failed", e);
+    }
   }, []);
 
   const toggleMusic = useCallback(() => {
     const audio = audioRef.current;
     if (!audio || !currentSound) return;
-    audio.paused ? audio.play() : audio.pause();
+    if (audio.paused) {
+      audio.play().catch((e) => console.error("Playback failed", e));
+    } else {
+      audio.pause();
+    }
   }, [currentSound]);
 
   const stopMusic = useCallback(() => {
@@ -207,10 +442,7 @@ export default function MeditationSession() {
   };
 
   const remaining = ROUND_SECONDS - elapsed;
-  const progress  = (elapsed / ROUND_SECONDS) * 100;
-
-  const skip = (delta: number) =>
-    setElapsed((prev) => Math.min(Math.max(prev + delta, 0), ROUND_SECONDS));
+  const progress = (elapsed / ROUND_SECONDS) * 100;
 
   const goToRound = (round: number) => {
     if (round < 1 || round > TOTAL_ROUNDS) return;
@@ -221,8 +453,8 @@ export default function MeditationSession() {
     setIsPlaying(true);
   };
 
-  const canPrev   = currentRound > 1;
-  const canNext   = currentRound < TOTAL_ROUNDS;
+  const canPrev = currentRound > 1;
+  const canNext = currentRound < TOTAL_ROUNDS;
   const themeInfo = THEME_QUERIES[theme] ?? THEME_QUERIES[DEFAULT_THEME];
 
   // ─────────────────────────────────────────────
@@ -233,16 +465,32 @@ export default function MeditationSession() {
       <div className={styles.ambientGlow} />
 
       {/* Back */}
-      <button className={styles.backBtn} aria-label="Go back"
-        onClick={() => { stopMusic(); navigate("/meditationsetup"); }}>
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+      <button
+        className={styles.backBtn}
+        aria-label="Go back"
+        onClick={() => {
+          stopMusic();
+          navigate("/meditationsetup");
+        }}
+      >
+        <svg
+          width="20"
+          height="20"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
           <path d="M19 12H5M12 5l-7 7 7 7" />
         </svg>
       </button>
 
       {/* Music toggle */}
-      <button className={styles.musicToggleBtn}
-        onClick={() => setShowMusicPanel((v) => !v)} aria-label="Toggle music panel">
+      <button
+        className={styles.musicToggleBtn}
+        onClick={() => setShowMusicPanel((v) => !v)}
+        aria-label="Toggle music panel"
+      >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
           <path d="M12 3v10.55A4 4 0 1 0 14 17V7h4V3h-6z" />
         </svg>
@@ -250,21 +498,28 @@ export default function MeditationSession() {
         {musicPlaying && <span className={styles.musicActiveDot} />}
       </button>
 
-      {/* Quote */}
-      <div className={styles.quote}>
-        "Silence is not the absence of sound,<br />but the presence of focus."
-      </div>
-
       {/* ── Music Panel ── */}
       {showMusicPanel && (
         <div className={styles.musicPanel}>
           <div className={styles.musicPanelHeader}>
-            <span className={styles.musicPanelTitle}>{themeInfo.emoji} {themeInfo.label} 음악</span>
+            <span className={styles.musicPanelTitle}>
+              {themeInfo.emoji} {themeInfo.label} Music
+            </span>
             <div className={styles.volumeRow}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" opacity="0.5">
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                opacity="0.5"
+              >
                 <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3A4.5 4.5 0 0 0 14 7.97v8.05c1.48-.73 2.5-2.25 2.5-4.02z" />
               </svg>
-              <input type="range" min="0" max="1" step="0.05"
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.05"
                 value={volume}
                 onChange={(e) => setVolume(Number(e.target.value))}
                 className={styles.volumeSlider}
@@ -275,30 +530,57 @@ export default function MeditationSession() {
           {currentSound && (
             <div className={styles.nowPlaying}>
               <div className={styles.nowPlayingInfo}>
-                <span className={`${styles.nowPlayingDot} ${musicPlaying ? styles.nowPlayingDotActive : ""}`} />
-                <span className={styles.nowPlayingName}>{currentSound.name}</span>
+                <span
+                  className={`${styles.nowPlayingDot} ${musicPlaying ? styles.nowPlayingDotActive : ""}`}
+                />
+                <span className={styles.nowPlayingName}>
+                  {currentSound.name}
+                </span>
               </div>
               <div className={styles.nowPlayingControls}>
                 <button className={styles.musicCtrlBtn} onClick={toggleMusic}>
-                  {musicPlaying
-                    ? <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
-                    : <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                  }
+                  {musicPlaying ? (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                    </svg>
+                  ) : (
+                    <svg
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M8 5v14l11-7z" />
+                    </svg>
+                  )}
                 </button>
                 <button className={styles.musicCtrlBtn} onClick={stopMusic}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z" /></svg>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M6 6h12v12H6z" />
+                  </svg>
                 </button>
               </div>
             </div>
           )}
 
           <div className={styles.soundList}>
-            {soundLoading && <p className={styles.soundStatus}>불러오는 중...</p>}
-            {soundError && !soundLoading && <p className={styles.soundStatusError}>⚠ {soundError}</p>}
-            {!soundLoading && !soundError && sounds.length === 0 && (
-              <p className={styles.soundStatus}>결과 없음</p>
+            {soundError && (
+              <p className={styles.soundStatusError}>⚠ {soundError}</p>
             )}
-            {!soundLoading && sounds.map((sound) => (
+            {!soundError && sounds.length === 0 && (
+              <p className={styles.soundStatus}>음악 로딩 중...</p>
+            )}
+            {sounds.map((sound) => (
               <button
                 key={sound.id}
                 className={`${styles.soundItem} ${currentSound?.id === sound.id ? styles.soundItemActive : ""}`}
@@ -306,10 +588,25 @@ export default function MeditationSession() {
               >
                 <div className={styles.soundItemLeft}>
                   <span className={styles.soundItemPlay}>
-                    {currentSound?.id === sound.id && musicPlaying
-                      ? <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
-                      : <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                    }
+                    {currentSound?.id === sound.id && musicPlaying ? (
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                      </svg>
+                    ) : (
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                      >
+                        <path d="M8 5v14l11-7z" />
+                      </svg>
+                    )}
                   </span>
                   <span className={styles.soundItemName}>{sound.name}</span>
                 </div>
@@ -325,15 +622,22 @@ export default function MeditationSession() {
 
       {/* ── Session Layout ── */}
       <div className={styles.sessionLayout}>
-
         <button
           className={`${styles.sideBtn} ${!canPrev ? styles.sideBtnHidden : ""}`}
           aria-label="Previous round"
           onClick={() => goToRound(currentRound - 1)}
           disabled={!canPrev}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M15 18l-6-6 6-6" />
           </svg>
           <span className={styles.sideBtnLabel}>Round {currentRound - 1}</span>
@@ -341,13 +645,23 @@ export default function MeditationSession() {
 
         <div className={styles.card}>
           <header className={styles.cardHeader}>
-            <h1 className={styles.title}>Meditation</h1>
-            <div className={styles.listeningBadge}>
-              <span className={styles.pulseDot}>
-                <span className={styles.pingRing} />
-                <span className={styles.dotCore} />
-              </span>
-              <span className={styles.listeningLabel}>AI Assistant Listening</span>
+            <div className={styles.headerContent}>
+              <h1 className={styles.title}>Meditation</h1>
+              {/* Brainwave Status */}
+              <div className={styles.brainwaveStatus}>
+                <span
+                  className={`${styles.brainwaveDot} ${
+                    brainwaveConnected
+                      ? styles.brainwaveDotConnected
+                      : styles.brainwaveDotDisconnected
+                  }`}
+                />
+                <span className={styles.brainwaveLabel}>
+                  {brainwaveConnected
+                    ? `🧠 Att: ${brainwaveMetrics.attention} Med: ${brainwaveMetrics.meditation}`
+                    : "🧠 Offline"}
+                </span>
+              </div>
             </div>
           </header>
 
@@ -356,64 +670,61 @@ export default function MeditationSession() {
               <button
                 key={i}
                 className={`${styles.roundDot} ${
-                  i + 1 < currentRound  ? styles.roundDotDone
-                  : i + 1 === currentRound ? styles.roundDotActive
-                  : styles.roundDotPending
+                  i + 1 < currentRound
+                    ? styles.roundDotDone
+                    : i + 1 === currentRound
+                      ? styles.roundDotActive
+                      : styles.roundDotPending
                 }`}
                 onClick={() => goToRound(i + 1)}
                 aria-label={`Go to round ${i + 1}`}
               />
             ))}
-            <span className={styles.roundLabel}>Round {currentRound} / {TOTAL_ROUNDS}</span>
+            <span className={styles.roundLabel}>
+              Round {currentRound} / {TOTAL_ROUNDS}
+            </span>
           </div>
 
           <div className={styles.orbWrap}>
             <div className={styles.ringOuter} />
             <div className={styles.ringInner} />
-            <div className={`${styles.orb} ${isFinished ? styles.orbFinished : ""}`}>
+            <div
+              className={`${styles.orb} ${isFinished ? styles.orbFinished : ""}`}
+            >
               <div className={styles.orbGlow} />
             </div>
           </div>
 
-          <p className={styles.subtitle}>
-            {isFinished ? "Session complete 🎉" : "Take a deep breath"}
+          <p
+            className={`${styles.subtitle} ${isUnstable || brainwaveState === "unstable" ? styles.subtitleUnstable : ""}`}
+          >
+            {isFinished
+              ? "Session complete 🎉"
+              : guidanceLoading
+                ? "loading..."
+                : isUnstable || brainwaveState === "unstable"
+                  ? STABILITY_GUIDANCES.unstable[
+                      guidanceIndex % STABILITY_GUIDANCES.unstable.length
+                    ]
+                  : guidances[guidanceIndex] || "Take a deep breath"}
           </p>
 
           <div className={styles.timerSection}>
             <div className={styles.timerDisplay}>
-              <span className={styles.timerElapsed}>{formatTime(remaining)}</span>
+              <span className={styles.timerElapsed}>
+                {formatTime(remaining)}
+              </span>
               <span className={styles.timerDivider}>/</span>
-              <span className={styles.timerTotal}>{formatTime(ROUND_SECONDS)}</span>
+              <span className={styles.timerTotal}>
+                {formatTime(ROUND_SECONDS)}
+              </span>
             </div>
             <div className={styles.progressBar}>
-              <div className={styles.progressFill} style={{ width: `${progress}%` }} />
+              <div
+                className={styles.progressFill}
+                style={{ width: `${progress}%` }}
+              />
             </div>
-            {!isFinished ? (
-              <div className={styles.controls}>
-                <button className={styles.controlBtn} aria-label="Rewind 10s" onClick={() => skip(-10)}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M11.99 5V1l-5 5 5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6h-2c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z" />
-                    <text x="8.5" y="15.5" fontSize="5.5" fontFamily="sans-serif" fontWeight="bold" fill="currentColor">10</text>
-                  </svg>
-                </button>
-                <button className={styles.playPauseBtn} onClick={() => setIsPlaying((p) => !p)}> 
-                  {isPlaying
-                    ? <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" /></svg>
-                    : <svg width="30" height="30" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
-                  }
-                </button>
-                <button className={styles.controlBtn} aria-label="Forward 10s" onClick={() => skip(10)}>
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M18 13c0 3.31-2.69 6-6 6s-6-2.69-6-6 2.69-6 6-6v4l5-5-5-5v4c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8h-2z" />
-                    <text x="8.5" y="15.5" fontSize="5.5" fontFamily="sans-serif" fontWeight="bold" fill="currentColor">10</text>
-                  </svg>
-                </button>
-              </div>
-            ) : (
-              <button className={styles.finishBtn} onClick={() => { stopMusic(); navigate("/dashboard"); }}>
-                Back to Dashboard
-              </button>
-            )}
           </div>
         </div>
 
@@ -424,12 +735,19 @@ export default function MeditationSession() {
           disabled={!canNext}
         >
           <span className={styles.sideBtnLabel}>Round {currentRound + 1}</span>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-            stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
             <path d="M9 18l6-6-6-6" />
           </svg>
         </button>
-
       </div>
     </main>
   );
