@@ -2,8 +2,10 @@ import { useState, useEffect, useRef, useContext } from "react";
 import styles from "./css/ProfilePage.module.css";
 import { supabase } from "../lib/supabaseClient";
 import { UserContext } from "../contexts/userContextHelpers";
+// 새로 추가된 컴포넌트 및 옵션 임포트
+import AudioGuidanceModal from "../components/AudioGuidanceModal";
+import { AUDIO_OPTIONS } from "../constants/audioOptions";
 
-// meditationConstants.ts의 THEME_QUERIES에 맞춘 6가지 포커스 옵션
 const FOCUS_OPTIONS = [
   {
     id: "self-esteem",
@@ -94,7 +96,13 @@ export default function ProfilePage() {
 
   // Sanctuary Preferences
   const [aural] = useState("Tibetan Bowls");
-  const [audio] = useState("Minimalist Light");
+
+  // Audio Guidance 관련 상태 추가
+  const [audio, setAudio] = useState("female-calm"); // 기본값 ID
+  const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
+
+  // 현재 선택된 오디오의 라벨 찾기 (화면 표시용)
+  const currentAudioLabel = AUDIO_OPTIONS.find(opt => opt.id === audio)?.label || "Select Audio";
 
   // ── 데이터 Fetching ──
   useEffect(() => {
@@ -103,7 +111,8 @@ export default function ProfilePage() {
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("name, age_group, primary_focus, avatar_url, streak_days, sync_active")
+          // audio_guidance 추가
+          .select("name, age_group, primary_focus, avatar_url, streak_days, sync_active, audio_guidance")
           .eq("id", user.id)
           .single();
 
@@ -116,6 +125,8 @@ export default function ProfilePage() {
           if (data.avatar_url) setAvatarUrl(data.avatar_url);
           if (data.streak_days !== null && data.streak_days !== undefined) setStreak(`${data.streak_days} Days`);
           if (data.sync_active !== null && data.sync_active !== undefined) setSyncStatus(data.sync_active ? "Active" : "Inactive");
+          // DB에 오디오 세팅이 있으면 덮어쓰기
+          if (data.audio_guidance) setAudio(data.audio_guidance);
         }
       } catch (err) {
         console.error("Failed to fetch profile data:", err);
@@ -137,6 +148,7 @@ export default function ProfilePage() {
           name: name,
           age_group: age,
           primary_focus: focus,
+          audio_guidance: audio, // audio_guidance 저장 추가
         })
         .eq("id", user.id);
 
@@ -204,7 +216,7 @@ export default function ProfilePage() {
 
         {/* ── Bento Grid Layout ── */}
         <div className={styles.grid}>
-          {/* ── Column 1: Personal Details & Sanctuary (Left) ── */}
+          {/* ── Column 1: DETAILS COLUMN (Personal Details & Sanctuary) ── */}
           <div className={styles.detailsColumn}>
             <h2 className={styles.columnTitle}>Personal Details</h2>
 
@@ -269,10 +281,11 @@ export default function ProfilePage() {
                     </svg>
                   </div>
 
-                  <div className={styles.preferenceRow}>
+                  {/* Audio Guidance 팝업 오픈을 위한 클릭 이벤트 연결 */}
+                  <div className={styles.preferenceRow} onClick={() => setIsAudioModalOpen(true)}>
                     <div className={styles.preferenceInfo}>
                       <div className={styles.preferenceName}>Audio Guidance</div>
-                      <div className={styles.preferenceSelected}>Selected: {audio}</div>
+                      <div className={styles.preferenceSelected}>Selected: {currentAudioLabel}</div>
                     </div>
                     <svg className={styles.chevronRight} width="12" height="8" viewBox="0 0 12 8" fill="none">
                       <path d="M1 1.5L6 6.5L11 1.5" stroke="#A8A29E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -283,7 +296,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* ── Column 2: Primary Focus (Middle) ── */}
+          {/* ── Column 2: FOCUS COLUMN (Primary Focus) ── */}
           <div className={styles.focusColumn}>
             {/* Primary Focus Card (6 items) */}
             <div className={styles.card}>
@@ -319,7 +332,7 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          {/* ── Column 3: Profile Card & Save (Right) ── */}
+          {/* ── Column 3: PROFILE COLUMN (Profile Card & Save) ── */}
           <div className={styles.profileColumn}>
             <div className={styles.avatarSection}>
               <div className={styles.avatarWrap}>
@@ -362,10 +375,8 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Save 버튼을 위한 분리선 */}
             <div className={styles.actionDivider} />
 
-            {/* Save Button */}
             <button
               className={styles.btnSave}
               onClick={handleSaveProfile}
@@ -376,6 +387,14 @@ export default function ProfilePage() {
           </div>
         </div>
       </main>
+
+      {/* Audio Guidance Modal */}
+      <AudioGuidanceModal
+        isOpen={isAudioModalOpen}
+        onClose={() => setIsAudioModalOpen(false)}
+        currentSelection={audio}
+        onSelect={(newAudio) => setAudio(newAudio)}
+      />
     </div>
   );
 }

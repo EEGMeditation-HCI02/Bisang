@@ -1,10 +1,10 @@
 /* ============================================================
    ProfilePage.module.css — BiSang Design System
+   (이전 코드와 동일 - 덮어쓰기)
    ============================================================ */
 
 .root {
     background-color: var(--surface);
-    /* #FEF9F3 */
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -20,9 +20,7 @@
     gap: 64px;
 }
 
-/* ============================================================
-   HEADER
-   ============================================================ */
+/* HEADER */
 .header {
     display: flex;
     flex-direction: column;
@@ -36,7 +34,6 @@
     line-height: 48px;
     letter-spacing: -1.2px;
     color: var(--primary);
-    /* #755C1C */
     margin: 0;
 }
 
@@ -46,13 +43,10 @@
     font-size: 18px;
     line-height: 29px;
     color: var(--on-surface-variant);
-    /* #625F57 */
     margin: 0;
 }
 
-/* ============================================================
-   BENTO GRID LAYOUT
-   ============================================================ */
+/* BENTO GRID LAYOUT */
 .grid {
     display: flex;
     flex-direction: column;
@@ -67,9 +61,7 @@
     }
 }
 
-/* ============================================================
-   COLUMN 1: DETAILS COLUMN (Personal Details & Sanctuary)
-   ============================================================ */
+/* COLUMN 1: DETAILS COLUMN */
 .detailsColumn {
     width: 100%;
     max-width: 373px;
@@ -131,7 +123,7 @@
 }
 
 .preferenceRow:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+    background-color: rgba(0, 0, 0, 0.03);
 }
 
 .preferenceInfo {
@@ -156,23 +148,16 @@
     transform: rotate(-90deg);
 }
 
-
-/* ============================================================
-   COLUMN 2: FOCUS COLUMN (Primary Focus)
-   ============================================================ */
+/* COLUMN 2: FOCUS COLUMN */
 .focusColumn {
     width: 100%;
     max-width: 373px;
     display: flex;
     flex-direction: column;
     gap: 24px;
-    /* h2 타이틀 높이 보정 등 특별한 마진이 필요 없습니다 (디폴트로 상단 정렬) */
 }
 
-
-/* ============================================================
-   COLUMN 3: PROFILE COLUMN (Profile Card & Save)
-   ============================================================ */
+/* COLUMN 3: PROFILE COLUMN */
 .profileColumn {
     width: 100%;
     max-width: 373px;
@@ -283,18 +268,14 @@
     color: var(--on-surface);
 }
 
-/* Save 버튼 위쪽 분리선 */
 .actionDivider {
     width: 100%;
     height: 1px;
     background: rgba(182, 177, 168, 0.2);
-    margin: 32px 0 24px 0;
+    margin: 32px 0 24px 0; 
 }
 
-
-/* ============================================================
-   CARDS & INPUTS (Common)
-   ============================================================ */
+/* CARDS & INPUTS */
 .card {
     background: #FFFFFF;
     border: 1px solid rgba(182, 177, 168, 0.1);
@@ -319,8 +300,8 @@
     letter-spacing: 0.6px;
     text-transform: uppercase;
     color: #78716C;
-    text-align: left;
-    display: block;
+    text-align: left; 
+    display: block; 
     width: 100%;
 }
 
@@ -360,9 +341,7 @@
     pointer-events: none;
 }
 
-/* ============================================================
-   RADIO LIST (Primary Focus)
-   ============================================================ */
+/* RADIO LIST */
 .radioList {
     display: flex;
     flex-direction: column;
@@ -405,13 +384,13 @@
     font-size: 16px;
     color: #78350F;
     margin-bottom: 2px;
-    text-align: left;
+    text-align: left; 
 }
 
 .radioDesc {
     font-size: 12px;
     color: #A8A29E;
-    text-align: left;
+    text-align: left; 
 }
 
 .radioInput {
@@ -421,9 +400,7 @@
     cursor: pointer;
 }
 
-/* ============================================================
-   SAVE BUTTON
-   ============================================================ */
+/* SAVE BUTTON */
 .btnSave {
     width: 100%;
     height: 68px;
@@ -445,4 +422,145 @@
 
 .btnSave:active {
     transform: scale(0.98);
+}
+
+/* ============================================================
+   MODAL (Audio Guidance) - 신규 추가
+   ============================================================ */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px); /* 고급스러운 배경 블러 */
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    animation: fadeIn 0.2s ease-out;
+}
+
+.modalContent {
+    width: 100%;
+    max-width: 460px;
+    background: #FFFFFF;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.modalHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.modalTitle {
+    font-family: var(--font-headline);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+}
+
+.modalCloseBtn {
+    background: transparent;
+    border: none;
+    color: #A8A29E;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.modalCloseBtn:hover {
+    background: #F5F5F4;
+    color: #44403C;
+}
+
+.modalSubtitle {
+    font-size: 15px;
+    color: var(--on-surface-variant);
+    margin: 0 0 32px 0;
+    line-height: 1.5;
+}
+
+.modalOptionsList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.modalOptionCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border: 1px solid rgba(182, 177, 168, 0.3);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modalOptionCard:hover {
+    background: #FAFAF9;
+    border-color: rgba(182, 177, 168, 0.8);
+}
+
+.modalOptionActive {
+    background: rgba(255, 220, 143, 0.1);
+    border-color: var(--primary);
+}
+
+.modalOptionActive:hover {
+    background: rgba(255, 220, 143, 0.15);
+}
+
+.modalOptionInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.modalOptionLabel {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--on-surface);
+}
+
+.modalOptionDesc {
+    font-size: 13px;
+    color: var(--on-surface-variant);
+}
+
+.checkIcon {
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px) scale(0.98); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
 }
