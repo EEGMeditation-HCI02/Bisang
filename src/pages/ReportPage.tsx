@@ -4,76 +4,127 @@ import { supabase } from "../lib/supabaseClient";
 import { UserContext } from "../contexts/userContextHelpers";
 import SessionReportPage from "./SessionReportPage";
 
-// 더미 데이터 (Fallback)
+// 데이터가 없을 때 보여줄 기본값 (Fallback)
 const DUMMY_DATA = {
     score: 87,
     trend: "+4 pts this week",
     graphData: [
-        { day: "MON", minutes: 15, height: "35%" },
-        { day: "TUE", minutes: 22, height: "53%" },
-        { day: "WED", minutes: 12, height: "30%" },
-        { day: "THU", minutes: 30, height: "70%" },
-        { day: "FRI", minutes: 42, height: "100%" },
-        { day: "SAT", minutes: 25, height: "60%" },
-        { day: "SUN", minutes: 35, height: "82%" },
+        { day: "MON", minutes: 0, height: "10%" },
+        { day: "TUE", minutes: 0, height: "10%" },
+        { day: "WED", minutes: 0, height: "10%" },
+        { day: "THU", minutes: 0, height: "10%" },
+        { day: "FRI", minutes: 0, height: "10%" },
+        { day: "SAT", minutes: 0, height: "10%" },
+        { day: "SUN", minutes: 0, height: "10%" },
     ],
     aiFeedback: {
         pattern: "Morning sessions yield 20% faster entry into Alpha states compared to evenings.",
         recommendation: "Increase breathwork duration before evening sessions to improve transition time."
     },
     stats: {
-        duration: "4h 12m",
-        sessions: 14,
-        streak: "5 Days"
+        duration: "0h 0m",
+        sessions: 0,
+        streak: "0 Days"
     }
 };
 
 export default function ReportPage() {
     const { user } = useContext(UserContext);
     const [reportData, setReportData] = useState(DUMMY_DATA);
-    const [activeTab, setActiveTab] = useState("today"); // 기본값
+    const [activeTab, setActiveTab] = useState("Weekly");
 
     useEffect(() => {
-        const fetchReport = async () => {
-            if (!user) return;
-            if (!supabase) return;
+        const fetchWeeklyReport = async () => {
+            if (!user || !supabase) return;
             try {
+                // 1. 오늘을 기준으로 7일 전 날짜 구하기
+                const sevenDaysAgo = new Date();
+                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // 과거 6일 + 오늘 = 총 7일
+                sevenDaysAgo.setHours(0, 0, 0, 0);
+
+                // 2. 수퍼베이스에서 최근 7일치 데이터 모두 가져오기
                 const { data, error } = await supabase
                     .from("meditation_reports")
                     .select("*")
                     .eq("user_id", user.id)
-                    .order("created_at", { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
+                    .gte("created_at", sevenDaysAgo.toISOString())
+                    .order("created_at", { ascending: true }); // 과거순으로 정렬
 
                 if (error) throw error;
 
-                if (data) {
-                    const parsedGraphData = typeof data.graph_data === "string"
-                        ? JSON.parse(data.graph_data)
-                        : (data.graph_data || DUMMY_DATA.graphData);
+                // 3. 데이터가 존재하면 요일별로 가공(Aggregation) 시작
+                if (data && data.length > 0) {
+                    const daysMap = new Map();
+                    const today = new Date();
 
+                    // 최근 7일의 요일 틀(Map) 미리 만들기 (예: TUE, WED, THU ...)
+                    for (let i = 6; i >= 0; i--) {
+                        const d = new Date(today);
+                        d.setDate(d.getDate() - i);
+                        const dateString = d.toISOString().split('T')[0];
+                        const dayName = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                        daysMap.set(dateString, { day: dayName, minutes: 0 });
+                    }
+
+                    let totalScore = 0;
+                    let totalMinutes = 0;
+
+                    // 가져온 세션 데이터들을 요일별로 합산하기
+                    data.forEach((row) => {
+                        const rowDate = new Date(row.created_at).toISOString().split('T')[0];
+                        if (daysMap.has(rowDate)) {
+                            let mins = 0;
+                            // "9m 0s" 형태의 문자열에서 분(minutes) 숫자만 추출
+                            if (row.total_duration) {
+                                const minMatch = row.total_duration.match(/(\d+)m/);
+                                if (minMatch) mins = parseInt(minMatch[1], 10);
+                            }
+                            daysMap.get(rowDate).minutes += mins;
+                            totalMinutes += mins;
+                        }
+                        totalScore += (row.score || 0);
+                    });
+
+                    // 4. 그래프 높이(height) 계산 및 가공 완료
+                    const rawDays = Array.from(daysMap.values());
+                    const maxMins = Math.max(...rawDays.map(d => d.minutes), 30); // 기준점 최소 30분
+                    const formattedGraphData = rawDays.map(d => ({
+                        day: d.day,
+                        minutes: d.minutes,
+                        height: `${Math.max(10, Math.round((d.minutes / maxMins) * 100))}%` // 최소 높이 10% 보장
+                    }));
+
+                    // 통계 포맷팅
+                    const avgScore = Math.round(totalScore / data.length);
+                    const hours = Math.floor(totalMinutes / 60);
+                    const remainderMins = totalMinutes % 60;
+                    const durationStr = hours > 0 ? `${hours}h ${remainderMins}m` : `${remainderMins}m`;
+
+                    // AI 피드백과 스트릭은 가장 마지막(최신) 세션의 데이터를 사용
+                    const latestSession = data[data.length - 1];
+
+                    // 가공된 데이터 화면에 적용
                     setReportData({
-                        score: data.score ?? DUMMY_DATA.score,
-                        trend: data.trend ?? DUMMY_DATA.trend,
-                        graphData: parsedGraphData,
+                        score: avgScore,
+                        trend: "Steady progress", // 추후 이번주-저번주 비교 로직 추가 가능
+                        graphData: formattedGraphData,
                         aiFeedback: {
-                            pattern: data.ai_pattern ?? DUMMY_DATA.aiFeedback.pattern,
-                            recommendation: data.ai_recommendation ?? DUMMY_DATA.aiFeedback.recommendation
+                            pattern: latestSession?.ai_pattern || DUMMY_DATA.aiFeedback.pattern,
+                            recommendation: latestSession?.ai_recommendation || DUMMY_DATA.aiFeedback.recommendation
                         },
                         stats: {
-                            duration: data.total_duration ?? DUMMY_DATA.stats.duration,
-                            sessions: data.sessions_completed ?? DUMMY_DATA.stats.sessions,
-                            streak: data.current_streak ?? DUMMY_DATA.stats.streak
+                            duration: durationStr,
+                            sessions: data.length,
+                            streak: latestSession?.current_streak || DUMMY_DATA.stats.streak
                         }
                     });
                 }
             } catch (err) {
-                console.error("Failed to fetch report data.", err);
+                console.error("Failed to fetch weekly report data.", err);
             }
         };
 
-        fetchReport();
+        fetchWeeklyReport();
     }, [user]);
 
     const toggleSwitch = (
@@ -97,13 +148,14 @@ export default function ReportPage() {
         <div className={styles.root}>
             <main className={styles.main}>
 
+                <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', marginBottom: '16px' }}>
+                    {toggleSwitch}
+                </div>
+
                 {activeTab === "today" ? (
-                    <SessionReportPage toggleNode={toggleSwitch} />
-
+                    <SessionReportPage />
                 ) : (
-
                     <>
-                        {/* ── Weekly Header ── */}
                         <header className={styles.header}>
                             <div className={styles.headerLeft}>
                                 <h1 className={styles.title}>Weekly Cognitive Resonance</h1>
@@ -111,17 +163,9 @@ export default function ReportPage() {
                                     Your neural harmony over time. Analyze the depth of your focus and the quality of your stillness.
                                 </p>
                             </div>
-
-                            {/* 🌟 헤더 우측에 토글 버튼 고정 🌟 */}
-                            <div className={styles.headerRight}>
-                                {toggleSwitch}
-                            </div>
                         </header>
 
-                        {/* ── Weekly Bento Grid ── */}
                         <div className={styles.grid}>
-
-                            {/* 1. Resonance Score Card */}
                             <div className={`${styles.card} ${styles.scoreCard}`}>
                                 <div className={styles.scoreGlow} />
                                 <div className={styles.cardHeader}>
@@ -145,7 +189,6 @@ export default function ReportPage() {
                                 </div>
                             </div>
 
-                            {/* 2. Focus Graph Card */}
                             <div className={`${styles.card} ${styles.graphCard}`}>
                                 <div className={styles.cardHeader}>
                                     <h2 className={styles.cardTitle}>Alpha Wave Consistency</h2>
@@ -171,7 +214,6 @@ export default function ReportPage() {
                                 </div>
                             </div>
 
-                            {/* 3. AI Synthesis Panel */}
                             <div className={styles.aiPanel}>
                                 <div className={styles.aiHeaderWrap}>
                                     <div className={styles.aiHeader}>
@@ -213,7 +255,6 @@ export default function ReportPage() {
                                 </div>
                             </div>
 
-                            {/* 4. Mini Stats Row */}
                             <div className={styles.statsRow}>
                                 <div className={styles.statCard}>
                                     <div className={styles.statHeader}>
