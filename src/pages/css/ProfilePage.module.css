@@ -68,9 +68,112 @@
 }
 
 /* ============================================================
-   COLUMN 1: PROFILE CARD
+   COLUMN 1: DETAILS COLUMN (Personal Details & Sanctuary)
    ============================================================ */
-.profileCard {
+.detailsColumn {
+    width: 100%;
+    max-width: 373px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.columnTitle {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 36px;
+    color: #78350F;
+    margin: 0;
+    text-align: left;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.sanctuaryHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.sanctuaryIcon {
+    color: var(--primary);
+}
+
+.sanctuaryTitle {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 32px;
+    color: var(--on-surface);
+    margin: 0;
+    text-align: left;
+}
+
+.preferencesList {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.preferenceRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.preferenceRow:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.preferenceInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.preferenceName {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--on-surface);
+}
+
+.preferenceSelected {
+    font-size: 14px;
+    color: var(--on-surface-variant);
+}
+
+.chevronRight {
+    transform: rotate(-90deg);
+}
+
+
+/* ============================================================
+   COLUMN 2: FOCUS COLUMN (Primary Focus)
+   ============================================================ */
+.focusColumn {
+    width: 100%;
+    max-width: 373px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    /* h2 타이틀 높이 보정 등 특별한 마진이 필요 없습니다 (디폴트로 상단 정렬) */
+}
+
+
+/* ============================================================
+   COLUMN 3: PROFILE COLUMN (Profile Card & Save)
+   ============================================================ */
+.profileColumn {
     width: 100%;
     max-width: 373px;
     background: #F8F3EB;
@@ -78,13 +181,13 @@
     padding: 56px 40px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
 }
 
 .avatarSection {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 32px;
 }
 
@@ -130,9 +233,8 @@
     font-size: 30px;
     line-height: 36px;
     color: var(--on-surface);
-    /* #34322C */
     margin: 0 0 8px 0;
-    text-align: center;
+    text-align: left;
 }
 
 .profileRole {
@@ -140,7 +242,7 @@
     font-size: 16px;
     color: var(--on-surface-variant);
     margin: 0;
-    text-align: center;
+    text-align: left;
 }
 
 .statsDivider {
@@ -163,6 +265,7 @@
     padding: 16px;
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
 }
 
@@ -180,32 +283,18 @@
     color: var(--on-surface);
 }
 
-/* ============================================================
-   COLUMN 2: PERSONAL DETAILS
-   ============================================================ */
-.personalColumn {
+/* Save 버튼 위쪽 분리선 */
+.actionDivider {
     width: 100%;
-    max-width: 373px;
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
+    height: 1px;
+    background: rgba(182, 177, 168, 0.2);
+    margin: 32px 0 24px 0;
 }
 
-.columnTitle {
-    font-family: var(--font-headline);
-    font-weight: 700;
-    font-size: 36px;
-    color: #78350F;
-    margin: 0;
-}
 
-.formGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-/* CARDS */
+/* ============================================================
+   CARDS & INPUTS (Common)
+   ============================================================ */
 .card {
     background: #FFFFFF;
     border: 1px solid rgba(182, 177, 168, 0.1);
@@ -220,6 +309,7 @@
 .fieldBlock {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
 }
 
@@ -229,9 +319,11 @@
     letter-spacing: 0.6px;
     text-transform: uppercase;
     color: #78716C;
+    text-align: left;
+    display: block;
+    width: 100%;
 }
 
-/* Inputs & Selects */
 .input,
 .select {
     width: 100%;
@@ -268,7 +360,9 @@
     pointer-events: none;
 }
 
-/* Radio List */
+/* ============================================================
+   RADIO LIST (Primary Focus)
+   ============================================================ */
 .radioList {
     display: flex;
     flex-direction: column;
@@ -311,11 +405,13 @@
     font-size: 16px;
     color: #78350F;
     margin-bottom: 2px;
+    text-align: left;
 }
 
 .radioDesc {
     font-size: 12px;
     color: #A8A29E;
+    text-align: left;
 }
 
 .radioInput {
@@ -325,7 +421,9 @@
     cursor: pointer;
 }
 
-/* Save Button */
+/* ============================================================
+   SAVE BUTTON
+   ============================================================ */
 .btnSave {
     width: 100%;
     height: 68px;
@@ -347,81 +445,4 @@
 
 .btnSave:active {
     transform: scale(0.98);
-}
-
-/* ============================================================
-   COLUMN 3: SANCTUARY PREFERENCES
-   ============================================================ */
-.sanctuaryColumn {
-    width: 100%;
-    max-width: 373px;
-    margin-top: 77px;
-}
-
-@media (max-width: 1024px) {
-    .sanctuaryColumn {
-        margin-top: 0;
-    }
-}
-
-.sanctuaryHeader {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
-}
-
-.sanctuaryIcon {
-    color: var(--primary);
-}
-
-.sanctuaryTitle {
-    font-family: var(--font-headline);
-    font-weight: 700;
-    font-size: 24px;
-    line-height: 32px;
-    color: var(--on-surface);
-    margin: 0;
-}
-
-.preferencesList {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.preferenceRow {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.preferenceRow:hover {
-    background-color: rgba(0, 0, 0, 0.02);
-}
-
-.preferenceInfo {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.preferenceName {
-    font-weight: 700;
-    font-size: 16px;
-    color: var(--on-surface);
-}
-
-.preferenceSelected {
-    font-size: 14px;
-    color: var(--on-surface-variant);
-}
-
-.chevronRight {
-    transform: rotate(-90deg);
-    /* Adjust SVG rotation to point right/down depending on design (image shows down) */
 }
