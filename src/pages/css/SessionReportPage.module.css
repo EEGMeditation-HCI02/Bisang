@@ -24,47 +24,42 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    /* 양쪽 하단(baseline)을 맞춤 */
     width: 100%;
 }
 
 .headerLeft {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 16px;
+    max-width: 700px;
     text-align: left;
-    /* 글자 왼쪽 정렬 */
-}
-
-.subLabel {
-    font-weight: 500;
-    font-size: 14px;
-    letter-spacing: 1.4px;
-    text-transform: uppercase;
-    color: #755C1C;
-    margin: 0;
 }
 
 .title {
-    font-family: 'Noto Serif', serif;
-    font-weight: 700;
+    font-family: var(--font-headline);
+    font-weight: 400;
     font-size: 60px;
     line-height: 60px;
-    letter-spacing: -1.5px;
+    color: var(--primary);
     margin: 0;
     white-space: nowrap;
-    /* 제목 한 줄로 고정 */
     text-align: left;
 }
 
-/* 🌟 헤더 우측을 감싸는 컨테이너 (토글버튼 + 날짜) 🌟 */
+.subtitle {
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 29px;
+    color: var(--on-surface-variant);
+    margin: 0;
+    text-align: left;
+    white-space: nowrap;
+}
+
 .headerRight {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    /* 텍스트, 버튼 전부 우측 정렬 */
-    gap: 16px;
-    /* 토글과 날짜 사이 여백 */
 }
 
 .metaInfo {
@@ -89,7 +84,7 @@
     margin: 0;
 }
 
-/* ── Bento Grid (기존과 동일) ── */
+/* ── Bento Grid ── */
 .grid {
     display: flex;
     gap: 32px;

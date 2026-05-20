@@ -35,7 +35,6 @@
     gap: 16px;
     max-width: 700px;
     text-align: left;
-    /* 글자 왼쪽 정렬 */
 }
 
 .title {
@@ -46,7 +45,6 @@
     color: var(--primary);
     margin: 0;
     white-space: nowrap;
-    /* 제목 한 줄로 고정 */
     text-align: left;
 }
 
@@ -57,14 +55,37 @@
     color: var(--on-surface-variant);
     margin: 0;
     text-align: left;
-    /* 글자 왼쪽 정렬 */
+    white-space: nowrap;
 }
 
 .headerRight {
     display: flex;
     flex-direction: column;
     align-items: flex-end;
-    /* 토글 우측 정렬 */
+}
+
+/* 날짜 및 테마 정보 표시용 CSS (SessionReportPage에서 이식됨) */
+.metaInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.date {
+    font-style: italic;
+    font-weight: 400;
+    font-size: 18px;
+    color: #625F57;
+    margin: 0;
+}
+
+.sessionTheme {
+    font-weight: 500;
+    font-size: 16px;
+    color: #755C1C;
+    margin: 0;
+    white-space: nowrap;
 }
 
 /* Toggle Button */

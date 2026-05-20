@@ -5,6 +5,7 @@ import { UserContext } from "../contexts/userContextHelpers";
 
 interface SessionReportPageProps {
     toggleNode?: React.ReactNode;
+    hideHeader?: boolean; // 🌟 새로 추가된 속성
 }
 
 interface ReportData {
@@ -15,7 +16,7 @@ interface ReportData {
     created_at: string;
 }
 
-export default function SessionReportPage({ toggleNode }: SessionReportPageProps) {
+export default function SessionReportPage({ toggleNode, hideHeader }: SessionReportPageProps) {
     const { user } = useContext(UserContext);
     const [report, setReport] = useState<ReportData | null>(null);
     const [isLoading, setIsLoading] = useState(true);
@@ -48,42 +49,51 @@ export default function SessionReportPage({ toggleNode }: SessionReportPageProps
         fetchLatestReport();
     }, [user]);
 
+    const reportDate = report?.created_at
+        ? new Date(report.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+        : "October 24th, 2024";
+
+    // 단독으로 띄워졌을 때를 대비한 헤더 렌더링 로직 (ReportPage에서 부르면 렌더링 안 함)
+    const headerContent = hideHeader ? null : (
+        <header className={styles.header}>
+            <div className={styles.headerLeft}>
+                <h1 className={styles.title}>Today's Cognitive Resonance</h1>
+                <p className={styles.subtitle}>
+                    Your immediate neural reflection. Analyze your recent session's depth and stillness.
+                </p>
+            </div>
+
+            <div className={styles.headerRight}>
+                {toggleNode ? (
+                    toggleNode
+                ) : (
+                    <div className={styles.metaInfo}>
+                        <p className={styles.date}>{reportDate}</p>
+                        <p className={styles.sessionTheme}>10:30 AM — Morning Serenity</p>
+                    </div>
+                )}
+            </div>
+        </header>
+    );
+
     if (isLoading) {
-        return <div style={{ display: 'flex', justifyContent: 'center', padding: '100px 0' }}>Loading your reflection...</div>;
+        return (
+            <>
+                {headerContent}
+                <div style={{ display: 'flex', justifyContent: 'center', padding: '100px 0' }}>Loading your reflection...</div>
+            </>
+        );
     }
 
     const score = report?.score || 92;
     const aiText = report?.ai_recommendation || `"Your focus during the Relationships session was exceptionally deep, showing high resonance and empathy."`;
     const focusPercent = report?.trend || "88";
 
-    const reportDate = report?.created_at
-        ? new Date(report.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
-        : "October 24th, 2024";
-
     return (
         <>
-            {/* ── Header ── */}
-            <header className={styles.header}>
-                <div className={styles.headerLeft}>
-                    <p className={styles.subLabel}>SESSION SUMMARY</p>
-                    <h1 className={styles.title}>Your Reflection</h1>
-                </div>
+            {headerContent}
 
-                <div className={styles.headerRight}>
-                    {toggleNode ? (
-                        toggleNode
-                    ) : (
-                        <div className={styles.metaInfo}>
-                            <p className={styles.date}>{reportDate}</p>
-                            <p className={styles.sessionTheme}>10:30 AM — Morning Serenity</p>
-                        </div>
-                    )}
-                </div>
-            </header>
-
-            {/* ── Bento Grid ── */}
             <div className={styles.grid}>
-                {/* 1. Meditation Score */}
                 <div className={styles.scoreCard}>
                     <p className={styles.subLabel}>MEDITATION SCORE</p>
                     <div className={styles.scoreVisual}>
@@ -92,7 +102,6 @@ export default function SessionReportPage({ toggleNode }: SessionReportPageProps
                     </div>
                 </div>
 
-                {/* 2. AI Insights */}
                 <div className={styles.insightCard}>
                     <div>
                         <div className={styles.insightHeader}>
@@ -116,7 +125,6 @@ export default function SessionReportPage({ toggleNode }: SessionReportPageProps
                     />
                 </div>
 
-                {/* 3. Detailed Metrics */}
                 <div className={styles.metricsCol}>
                     <div className={styles.metricCard}>
                         <div className={styles.metricHeader}>
