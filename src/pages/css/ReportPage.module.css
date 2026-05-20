@@ -4,7 +4,6 @@
 
 .root {
     background-color: var(--surface);
-    /* #FEF9F3 */
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -34,7 +33,9 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
-    max-width: 672px;
+    max-width: 700px;
+    text-align: left;
+    /* 글자 왼쪽 정렬 */
 }
 
 .title {
@@ -43,8 +44,10 @@
     font-size: 60px;
     line-height: 60px;
     color: var(--primary);
-    /* #755C1C */
     margin: 0;
+    white-space: nowrap;
+    /* 제목 한 줄로 고정 */
+    text-align: left;
 }
 
 .subtitle {
@@ -53,6 +56,15 @@
     line-height: 29px;
     color: var(--on-surface-variant);
     margin: 0;
+    text-align: left;
+    /* 글자 왼쪽 정렬 */
+}
+
+.headerRight {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    /* 토글 우측 정렬 */
 }
 
 /* Toggle Button */
@@ -89,7 +101,7 @@
 }
 
 /* ============================================================
-   BENTO GRID
+   BENTO GRID (기존과 동일)
    ============================================================ */
 .grid {
     display: grid;
@@ -128,9 +140,6 @@
     margin: 0;
 }
 
-/* ============================================================
-   1. SCORE CARD
-   ============================================================ */
 .scoreCard {
     grid-column: span 5;
     display: flex;
@@ -192,9 +201,6 @@
     width: max-content;
 }
 
-/* ============================================================
-   2. GRAPH CARD
-   ============================================================ */
 .graphCard {
     grid-column: span 7;
     display: flex;
@@ -237,16 +243,12 @@
     position: relative;
     cursor: pointer;
     transform-origin: bottom;
-    /* 아래를 기점으로 확대 */
 }
 
-/* 수정: 호버 시 노란색으로 변하고 살짝 위로 커짐 */
 .barFill:hover {
     background: #FFDC8F;
     transform: scaleY(1.05);
 }
-
-/* styles.barPeak 제거 */
 
 .barLabel {
     font-size: 12px;
@@ -255,7 +257,6 @@
     color: var(--on-surface-variant);
 }
 
-/* Tooltip (Hover) */
 .tooltip {
     position: absolute;
     top: -32px;
@@ -270,9 +271,7 @@
     white-space: nowrap;
     opacity: 0;
     visibility: hidden;
-    /* 수정: 툴팁 나타나는 속도 살짝 조정 */
     transition: opacity 0.2s ease 0.1s;
-    /* 0.1s 지연 후 나타남 */
     z-index: 10;
 }
 
@@ -281,9 +280,6 @@
     visibility: visible;
 }
 
-/* ============================================================
-   3. AI SYNTHESIS PANEL
-   ============================================================ */
 .aiPanel {
     grid-column: span 12;
     background: rgba(254, 249, 243, 0.6);
@@ -376,9 +372,6 @@
     margin: 0;
 }
 
-/* ============================================================
-   4. MINI STATS ROW
-   ============================================================ */
 .statsRow {
     grid-column: span 12;
     display: grid;
