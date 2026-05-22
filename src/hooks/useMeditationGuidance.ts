@@ -24,7 +24,11 @@ export function useMeditationGuidance(theme: string): UseGuidanceReturn {
       try {
         const loadedGuidances = await generateMeditationGuidances(theme);
         if (isMounted) {
-          setGuidances(loadedGuidances);
+          // 각 문장을 개별 문장으로 쪼갭니다 (온점, 물음표, 느낌표 기준)
+          const splitSentences = loadedGuidances.flatMap((phrase) =>
+            phrase.split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter(Boolean),
+          );
+          setGuidances(splitSentences);
           setGuidanceIndex(0);
           setGuidanceLoading(false);
         }
@@ -44,7 +48,7 @@ export function useMeditationGuidance(theme: string): UseGuidanceReturn {
     };
   }, [theme]);
 
-  // 멘트 회전 타이머 (3초마다)
+  // 멘트 회전 타이머 (10초마다)
   useEffect(() => {
     if (guidances.length === 0 || guidanceLoading) return;
 
@@ -52,7 +56,7 @@ export function useMeditationGuidance(theme: string): UseGuidanceReturn {
 
     guidanceIntervalRef.current = setInterval(() => {
       setGuidanceIndex((prev) => (prev + 1) % guidances.length);
-    }, 3000);
+    }, 10000);
 
     return () => {
       if (guidanceIntervalRef.current)

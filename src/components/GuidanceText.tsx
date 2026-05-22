@@ -1,4 +1,4 @@
-import type { FC } from "react";
+import { useState, useEffect, type FC } from "react";
 import styles from "../pages/css/MeditationPage.module.css";
 import { STABILITY_GUIDANCES } from "../hooks/useMeditationLLM";
 
@@ -19,20 +19,43 @@ export const GuidanceText: FC<GuidanceTextProps> = ({
   guidances,
   guidanceIndex,
 }) => {
-  let text = "Take a deep breath";
+  // Determine target text
+  let targetText = "Take a deep breath";
+
+  // 불안정 상황의 문장도 한 문장씩 쪼갭니다.
+  const unstableGuidances = STABILITY_GUIDANCES.unstable.flatMap((phrase) =>
+    phrase.split(/(?<=[.!?])\s+/).map((s) => s.trim()).filter(Boolean),
+  );
 
   if (isFinished) {
-    text = "Session complete 🎉";
+    targetText = "Session complete 🎉";
   } else if (isLoading) {
-    text = "loading...";
+    targetText = "loading...";
   } else if (isUnstable || brainwaveState === "unstable") {
-    text =
-      STABILITY_GUIDANCES.unstable[
-        guidanceIndex % STABILITY_GUIDANCES.unstable.length
-      ];
+    targetText =
+      unstableGuidances[guidanceIndex % unstableGuidances.length] ||
+      "Return to your breath";
   } else if (guidances.length > 0) {
-    text = guidances[guidanceIndex] || "Take a deep breath";
+    targetText = guidances[guidanceIndex] || "Take a deep breath";
   }
+
+  const [displayText, setDisplayText] = useState(targetText);
+  const [isFading, setIsFading] = useState(false);
+
+  useEffect(() => {
+    if (displayText === targetText) return;
+
+    // 1단계: Fade out 시작
+    setIsFading(true);
+
+    // 2단계: 800ms 후 텍스트를 교체하고 Fade in
+    const timer = setTimeout(() => {
+      setDisplayText(targetText);
+      setIsFading(false);
+    }, 800);
+
+    return () => clearTimeout(timer);
+  }, [targetText, displayText]);
 
   return (
     <p
@@ -40,9 +63,9 @@ export const GuidanceText: FC<GuidanceTextProps> = ({
         isUnstable || brainwaveState === "unstable"
           ? styles.subtitleUnstable
           : ""
-      }`}
+      } ${isFading ? styles.subtitleFaded : ""}`}
     >
-      {text}
+      {displayText}
     </p>
   );
 };
