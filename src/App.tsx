@@ -16,6 +16,8 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 import { AuthProvider } from "./contexts/userContext"; // 경로는 실제 위치에 맞게
+import ReportPage from "./pages/ReportPage";
+import SessionReportPage from "./pages/SessionReportPage";
 
 // 헤더/푸터를 숨길 경로 목록
 const HIDE_LAYOUT_PATHS = ["/meditation", "/meditationsetup"];
@@ -49,6 +51,8 @@ function App() {
             <Route path="/testguide" element={<TestGuidePage />} />
             <Route path="/usersetting" element={<UserSettingPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/reports" element={<ReportPage />} />
+            <Route path="/sessionreports" element={<SessionReportPage />} />
           </Routes>
         </Layout>
       </AuthProvider>

@@ -4,7 +4,6 @@
 
 .root {
     background-color: var(--surface);
-    /* #FEF9F3 */
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -20,9 +19,7 @@
     gap: 64px;
 }
 
-/* ============================================================
-   HEADER
-   ============================================================ */
+/* HEADER */
 .header {
     display: flex;
     flex-direction: column;
@@ -36,7 +33,6 @@
     line-height: 48px;
     letter-spacing: -1.2px;
     color: var(--primary);
-    /* #755C1C */
     margin: 0;
 }
 
@@ -46,13 +42,10 @@
     font-size: 18px;
     line-height: 29px;
     color: var(--on-surface-variant);
-    /* #625F57 */
     margin: 0;
 }
 
-/* ============================================================
-   BENTO GRID LAYOUT
-   ============================================================ */
+/* BENTO GRID LAYOUT */
 .grid {
     display: flex;
     flex-direction: column;
@@ -67,10 +60,104 @@
     }
 }
 
-/* ============================================================
-   COLUMN 1: PROFILE CARD
-   ============================================================ */
-.profileCard {
+/* COLUMN 1: DETAILS COLUMN */
+.detailsColumn {
+    width: 100%;
+    max-width: 373px;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+}
+
+.columnTitle {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 36px;
+    color: #78350F;
+    margin: 0;
+    text-align: left;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.sanctuaryHeader {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.sanctuaryIcon {
+    color: var(--primary);
+}
+
+.sanctuaryTitle {
+    font-family: var(--font-headline);
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 32px;
+    color: var(--on-surface);
+    margin: 0;
+    text-align: left;
+}
+
+.preferencesList {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.preferenceRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.preferenceRow:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+}
+
+.preferenceInfo {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+.preferenceName {
+    font-weight: 700;
+    font-size: 16px;
+    color: var(--on-surface);
+}
+
+.preferenceSelected {
+    font-size: 14px;
+    color: var(--on-surface-variant);
+}
+
+.chevronRight {
+    transform: rotate(-90deg);
+}
+
+/* COLUMN 2: FOCUS COLUMN */
+.focusColumn {
+    width: 100%;
+    max-width: 373px;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* COLUMN 3: PROFILE COLUMN */
+.profileColumn {
     width: 100%;
     max-width: 373px;
     background: #F8F3EB;
@@ -78,13 +165,13 @@
     padding: 56px 40px;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
 }
 
 .avatarSection {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 32px;
 }
 
@@ -130,9 +217,8 @@
     font-size: 30px;
     line-height: 36px;
     color: var(--on-surface);
-    /* #34322C */
     margin: 0 0 8px 0;
-    text-align: center;
+    text-align: left;
 }
 
 .profileRole {
@@ -140,7 +226,7 @@
     font-size: 16px;
     color: var(--on-surface-variant);
     margin: 0;
-    text-align: center;
+    text-align: left;
 }
 
 .statsDivider {
@@ -163,6 +249,7 @@
     padding: 16px;
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
 }
 
@@ -180,32 +267,14 @@
     color: var(--on-surface);
 }
 
-/* ============================================================
-   COLUMN 2: PERSONAL DETAILS
-   ============================================================ */
-.personalColumn {
+.actionDivider {
     width: 100%;
-    max-width: 373px;
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
+    height: 1px;
+    background: rgba(182, 177, 168, 0.2);
+    margin: 32px 0 24px 0; 
 }
 
-.columnTitle {
-    font-family: var(--font-headline);
-    font-weight: 700;
-    font-size: 36px;
-    color: #78350F;
-    margin: 0;
-}
-
-.formGroup {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-/* CARDS */
+/* CARDS & INPUTS */
 .card {
     background: #FFFFFF;
     border: 1px solid rgba(182, 177, 168, 0.1);
@@ -220,6 +289,7 @@
 .fieldBlock {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: 8px;
 }
 
@@ -229,9 +299,11 @@
     letter-spacing: 0.6px;
     text-transform: uppercase;
     color: #78716C;
+    text-align: left; 
+    display: block; 
+    width: 100%;
 }
 
-/* Inputs & Selects */
 .input,
 .select {
     width: 100%;
@@ -268,7 +340,7 @@
     pointer-events: none;
 }
 
-/* Radio List */
+/* RADIO LIST */
 .radioList {
     display: flex;
     flex-direction: column;
@@ -311,11 +383,13 @@
     font-size: 16px;
     color: #78350F;
     margin-bottom: 2px;
+    text-align: left; 
 }
 
 .radioDesc {
     font-size: 12px;
     color: #A8A29E;
+    text-align: left; 
 }
 
 .radioInput {
@@ -325,7 +399,7 @@
     cursor: pointer;
 }
 
-/* Save Button */
+/* SAVE BUTTON */
 .btnSave {
     width: 100%;
     height: 68px;
@@ -350,78 +424,142 @@
 }
 
 /* ============================================================
-   COLUMN 3: SANCTUARY PREFERENCES
+   MODAL (Audio Guidance) - 신규 추가
    ============================================================ */
-.sanctuaryColumn {
-    width: 100%;
-    max-width: 373px;
-    margin-top: 77px;
-}
-
-@media (max-width: 1024px) {
-    .sanctuaryColumn {
-        margin-top: 0;
-    }
-}
-
-.sanctuaryHeader {
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(4px); /* 고급스러운 배경 블러 */
+    z-index: 1000;
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
+    justify-content: center;
+    padding: 24px;
+    animation: fadeIn 0.2s ease-out;
 }
 
-.sanctuaryIcon {
-    color: var(--primary);
+.modalContent {
+    width: 100%;
+    max-width: 460px;
+    background: #FFFFFF;
+    border-radius: 24px;
+    padding: 40px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.sanctuaryTitle {
-    font-family: var(--font-headline);
-    font-weight: 700;
-    font-size: 24px;
-    line-height: 32px;
-    color: var(--on-surface);
-    margin: 0;
-}
-
-.preferencesList {
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-}
-
-.preferenceRow {
+.modalHeader {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px;
-    border-radius: 12px;
+    margin-bottom: 8px;
+}
+
+.modalTitle {
+    font-family: var(--font-headline);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+}
+
+.modalCloseBtn {
+    background: transparent;
+    border: none;
+    color: #A8A29E;
     cursor: pointer;
-    transition: background-color 0.2s;
+    padding: 8px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
 }
 
-.preferenceRow:hover {
-    background-color: rgba(0, 0, 0, 0.02);
+.modalCloseBtn:hover {
+    background: #F5F5F4;
+    color: #44403C;
 }
 
-.preferenceInfo {
+.modalSubtitle {
+    font-size: 15px;
+    color: var(--on-surface-variant);
+    margin: 0 0 32px 0;
+    line-height: 1.5;
+}
+
+.modalOptionsList {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 16px;
 }
 
-.preferenceName {
+.modalOptionCard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border: 1px solid rgba(182, 177, 168, 0.3);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.modalOptionCard:hover {
+    background: #FAFAF9;
+    border-color: rgba(182, 177, 168, 0.8);
+}
+
+.modalOptionActive {
+    background: rgba(255, 220, 143, 0.1);
+    border-color: var(--primary);
+}
+
+.modalOptionActive:hover {
+    background: rgba(255, 220, 143, 0.15);
+}
+
+.modalOptionInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.modalOptionLabel {
     font-weight: 700;
     font-size: 16px;
     color: var(--on-surface);
 }
 
-.preferenceSelected {
-    font-size: 14px;
+.modalOptionDesc {
+    font-size: 13px;
     color: var(--on-surface-variant);
 }
 
-.chevronRight {
-    transform: rotate(-90deg);
-    /* Adjust SVG rotation to point right/down depending on design (image shows down) */
+.checkIcon {
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(20px) scale(0.98); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0) scale(1); 
+    }
 }
