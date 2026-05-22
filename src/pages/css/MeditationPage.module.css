@@ -517,7 +517,13 @@
   margin-bottom: 2.5rem;
   transition:
     color 300ms ease,
-    opacity 300ms ease;
+    opacity 800ms cubic-bezier(0.4, 0, 0.2, 1),
+    transform 800ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.subtitleFaded {
+  opacity: 0 !important;
+  transform: translateY(6px);
 }
 
 /* 불안정/움직임 많을 때 */

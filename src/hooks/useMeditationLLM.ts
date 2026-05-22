@@ -171,7 +171,7 @@ export async function generateMeditationGuidances(
   }
 
   const theme = THEMES[themeType] || THEMES["calm"];
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
 
   const systemPrompt = `You are an experienced meditation guide.
 Write calm, gentle, and supportive meditation phrases in English.
@@ -230,7 +230,8 @@ Return ONLY the JSON, no other text.`;
           ],
           generationConfig: {
             temperature: 0.8,
-            maxOutputTokens: 800,
+            maxOutputTokens: 4000,
+            responseMimeType: "application/json",
           },
         }),
       });
@@ -254,21 +255,26 @@ Return ONLY the JSON, no other text.`;
       // JSON 추출 시도
       const jsonMatch = responseText.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0]);
-        if (
-          Array.isArray(parsed.guidances) &&
-          parsed.guidances.length > 0 &&
-          parsed.guidances.every((g: unknown) => typeof g === "string")
-        ) {
-          console.log(`✅ AI 멘트 생성 완료: ${parsed.guidances.length}개`);
-          // ✅ 메모리 캐시에 저장
-          guidanceCache.set(themeType, parsed.guidances);
-          // ✅ LocalStorage에도 저장 (페이지 새로고침 후에도 유지)
-          setCachedGuidance(themeType, parsed.guidances);
-          return parsed.guidances;
+        try {
+          const parsed = JSON.parse(jsonMatch[0]);
+          if (
+            Array.isArray(parsed.guidances) &&
+            parsed.guidances.length > 0 &&
+            parsed.guidances.every((g: unknown) => typeof g === "string")
+          ) {
+            console.log(`✅ AI 멘트 생성 완료: ${parsed.guidances.length}개`);
+            // ✅ 메모리 캐시에 저장
+            guidanceCache.set(themeType, parsed.guidances);
+            // ✅ LocalStorage에도 저장 (페이지 새로고침 후에도 유지)
+            setCachedGuidance(themeType, parsed.guidances);
+            return parsed.guidances;
+          }
+        } catch (parseError) {
+          console.error("❌ JSON 파싱 실패:", parseError);
         }
       }
 
+      console.warn("⚠️ 응답 형식 검증 실패. 받은 텍스트:", responseText);
       throw new Error("응답 형식 오류");
     } catch (error) {
       // 마지막 시도에서도 실패하면 기본 멘트 사용
