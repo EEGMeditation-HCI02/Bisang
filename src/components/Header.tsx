@@ -2,7 +2,7 @@ import { motion } from "motion/react";
 import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import { LogOut } from "lucide-react";
-import styles from "./CSS/Header.module.css";
+import styles from "./css/Header.module.css";
 import GoogleLoginButton from "./GoogleLoginButton";
 import { useUser } from "../contexts/userContextHelpers";
 import { supabase } from "../lib/supabaseClient";
