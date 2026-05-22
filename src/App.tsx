@@ -52,7 +52,7 @@ function App() {
             <Route path="/usersetting" element={<UserSettingPage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/reports" element={<ReportPage />} />
-            {/* <Route path="/sessionreports" element={<SessionReportPage />} /> */}
+            <Route path="/sessionreports" element={<SessionReportPage />} />
           </Routes>
         </Layout>
       </AuthProvider>
