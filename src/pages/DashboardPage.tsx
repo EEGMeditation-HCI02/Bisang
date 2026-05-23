@@ -1,9 +1,11 @@
 import { useUser } from "../contexts/userContextHelpers";
+import { useNavigate } from "react-router-dom";
 
 import styles from "./css/DashboardPage.module.css";
 
 export default function Dashboard() {
   const { user } = useUser();
+  const navigate = useNavigate();
 
   return (
     <div className={styles.root}>
@@ -37,7 +39,7 @@ export default function Dashboard() {
                 </p>
               </div>
               <div className={styles.meditationPlayer}>
-                <button className={styles.playBtn} aria-label="Play">
+                <button className={styles.playBtn} aria-label="Play" onClick={() => navigate('/meditationsetup')}>
                   {/* Play icon */}
                   <svg
                     width="28"
@@ -51,7 +53,7 @@ export default function Dashboard() {
                 <div className={styles.meditationMeta}>
                   <span className={styles.meditationName}>Morning Clarity</span>
                   <span className={styles.meditationDetail}>
-                    15 min • Alpha Waves
+                    let's start the day with a clear mind and focused energy
                   </span>
                 </div>
               </div>
@@ -59,7 +61,7 @@ export default function Dashboard() {
           </div>
 
           {/* Profile Edit */}
-          <div className={`${styles.card} ${styles.cardProfile}`}>
+          <div className={`${styles.card} ${styles.cardProfile}`} onClick={() => navigate('/profile')}>
             <div className={styles.cardProfileTop}>
               <div className={styles.profileAvatar}>
                 <img
