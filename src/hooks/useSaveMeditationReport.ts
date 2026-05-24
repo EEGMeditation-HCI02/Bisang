@@ -1,5 +1,5 @@
 import { useEffect, useRef, useContext } from "react";
-import { useNavigate } from "react-router-dom";
+//import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { UserContext } from "../contexts/userContextHelpers";
 import type { BrainwaveMetrics } from "./useMeditationLLM";
