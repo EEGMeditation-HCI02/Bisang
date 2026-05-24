@@ -21,7 +21,7 @@ export default function TestSaveButton() {
     // ── 임의 테스트 데이터 ──────────────────────────────
     const totalMinutes = 12; // 3분 × 4라운드
     const score = 85;
-    const today = new Date().toISOString().split("T")[0];
+    //const today = new Date().toISOString().split("T")[0];
 
     // 오늘 포함 7일 graph_data 더미
     const days = ["MON","TUE","WED","THU","FRI","SAT","SUN"];
