@@ -61,7 +61,7 @@ export function useSaveMeditationReport({
           .toISOString()
           .split("T")[0];
 
-        const { data: yesterdayData } = await supabase
+        const { data: yesterdayData } = await supabase!
           .from("meditation_reports")
           .select("current_streak")
           .eq("user_id", user.id)
@@ -81,7 +81,7 @@ export function useSaveMeditationReport({
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
         sevenDaysAgo.setHours(0, 0, 0, 0);
 
-        const { data: pastData } = await supabase
+        const { data: pastData } = await supabase!
           .from("meditation_reports")
           .select("created_at, total_duration")
           .eq("user_id", user.id)
@@ -167,7 +167,7 @@ Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
         }
 
         // ── Supabase INSERT ─────────────────────────────────────
-        const { error } = await supabase.from("meditation_reports").insert({
+        const { error } = await supabase!.from("meditation_reports").insert({
           user_id:             user.id,
           score,
           trend,
