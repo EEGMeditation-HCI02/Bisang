@@ -42,8 +42,7 @@ export default function SessionReportPage({ toggleNode, hideHeader }: SessionRep
 
     const fetch = async () => {
         try {
-        const { data, error } = await supabase
-            .from("meditation_reports")
+        const { data, error } = await supabase!.from("meditation_reports")
             .select("score, trend, total_duration, sessions_completed, current_streak, ai_pattern, ai_recommendation, created_at")
             .eq("user_id", user.id)
             .order("created_at", { ascending: false })
