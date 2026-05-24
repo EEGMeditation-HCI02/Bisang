@@ -261,3 +261,22 @@
     font-size: 20px;
     color: rgba(117, 92, 28, 0.6);
 }
+
+/* SessionReportPage.module.css에 추가 */
+.insightPattern {
+  font-size: 0.8125rem;
+  color: var(--color-on-surface-variant, #625f57);
+  margin-bottom: 0.75rem;
+  line-height: 1.5;
+}
+
+.patternBadge {
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #835431;
+  background: rgba(253, 191, 147, 0.3);
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  margin-right: 0.5rem;
+}
