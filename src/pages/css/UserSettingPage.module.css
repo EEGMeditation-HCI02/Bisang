@@ -180,6 +180,7 @@
   flex-direction: column;
   gap: 2rem;
   animation: fadeUp 0.7s 0.1s ease both;
+  text-align: left;
 }
 
 /* Step indicator block */
@@ -362,12 +363,14 @@
   font-size: 0.9375rem;
   color: #92400e;
   margin-bottom: 0.125rem;
+  text-align: left;
 }
 
 .radioDesc {
   font-size: 0.75rem;
   color: #a8a29e;
   line-height: 1.4;
+  text-align: left;
 }
 
 .radioInput {
