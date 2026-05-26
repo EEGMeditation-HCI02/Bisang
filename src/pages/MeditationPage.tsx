@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./css/MeditationPage.module.css";
 import { useMeditationTimer } from "../hooks/useMeditationTimer";
@@ -6,7 +6,9 @@ import { useMeditationMusic } from "../hooks/useMeditationMusic";
 import { useBrainwaveConnection } from "../hooks/useBrainwaveConnection";
 import { useMotionStability } from "../hooks/useMotionStability";
 import { useMeditationGuidance } from "../hooks/useMeditationGuidance";
-import { useSaveMeditationReport } from "../hooks/useSaveMeditationReport"; // ✅
+import { useSaveMeditationReport } from "../hooks/useSaveMeditationReport";
+import { usePoseAnalysis } from "../hooks/usePoseAnalysis";
+import { useMeditationStore, type SessionDetail } from "../store/useMeditationStore";
 import { MusicPanel } from "../components/MusicPanel";
 import { RoundIndicator } from "../components/RoundIndicator";
 import { TimerDisplay } from "../components/TimerDisplay";
@@ -18,7 +20,7 @@ import {
   TOTAL_ROUNDS,
 } from "../constants/meditationConstants";
 
-import TestSaveButton from "../components/TestSaveButton";  //테스트용
+import TestSaveButton from "../components/TestSaveButton"; // 테스트용
 
 export default function MeditationSession() {
   const navigate = useNavigate();
@@ -31,20 +33,107 @@ export default function MeditationSession() {
   const timer = useMeditationTimer({ durationMin, totalRounds: TOTAL_ROUNDS });
   const music = useMeditationMusic(theme);
   const brainwave = useBrainwaveConnection();
-  const { isUnstable, unstableCount } = useMotionStability(); // ✅ unstableCount 추가
+  const { isUnstable, unstableCount } = useMotionStability();
   const guidance = useMeditationGuidance(theme);
+  const { startSession, stopSession } = usePoseAnalysis();
 
-  // ── Local State ──
+  // ── Zustand Store ──
+  const setLatestSessionResult = useMeditationStore((state) => state.setLatestSessionResult);
+
+  // ── Local State & Refs ──
   const [showMusicPanel, setShowMusicPanel] = useState(false);
+  const [sessionDetail, setSessionDetail] = useState<SessionDetail | null>(null);
+  
+  // Brainwave metrics history array to compute session averages
+  const brainwaveHistoryRef = useRef<{ attention: number; meditation: number }[]>([]);
 
-  // ✅ 명상 완료 시 자동 저장 → /reports 이동
+  // ── Start Pose Analysis on Mount ──
+  useEffect(() => {
+    const initPose = async () => {
+      try {
+        console.log("🎥 Starting pose analysis session...");
+        await startSession();
+      } catch (err) {
+        console.error("❌ Failed to start camera/pose analysis:", err);
+      }
+    };
+    initPose();
+  }, [startSession]);
+
+  // ── Accumulate Brainwave Metrics ──
+  useEffect(() => {
+    if (timer.isPlaying && !timer.isFinished) {
+      brainwaveHistoryRef.current.push({
+        attention: brainwave.brainwaveMetrics.attention,
+        meditation: brainwave.brainwaveMetrics.meditation,
+      });
+    }
+  }, [brainwave.brainwaveMetrics, timer.isPlaying, timer.isFinished]);
+
+  // ── On Meditation Finished: Stop Analysis and Calculate Scores ──
+  useEffect(() => {
+    if (timer.isFinished && !sessionDetail) {
+      console.log("🧘 Meditation session finished. Calculating final scores...");
+      const poseRes = stopSession();
+      console.log("📷 Pose analysis results:", poseRes);
+
+      // Compute brainwave averages
+      const validHistory = brainwaveHistoryRef.current.filter(
+        (m) => m.attention > 0 || m.meditation > 0
+      );
+      const attentionAvg = validHistory.length > 0
+        ? Math.round(validHistory.reduce((sum, h) => sum + h.attention, 0) / validHistory.length)
+        : 70; // baseline
+      const meditationAvg = validHistory.length > 0
+        ? Math.round(validHistory.reduce((sum, h) => sum + h.meditation, 0) / validHistory.length)
+        : 70; // baseline
+
+      // Compute components
+      const postureScore = poseRes.postureScore;
+      const eyeClosedRatio = poseRes.durationMs > 0
+        ? poseRes.eyeClosedMs / poseRes.durationMs
+        : 0.8;
+      const eyeClosedScore = Math.min(100, Math.round(eyeClosedRatio * 100 * (1 / 0.9)));
+
+      // Composite Score: Posture (30%) + Eye Closure (30%) + Meditation (20%) + Attention (20%)
+      const finalScore = Math.min(
+        100,
+        Math.max(
+          0,
+          Math.round(
+            postureScore * 0.3 +
+            eyeClosedScore * 0.3 +
+            meditationAvg * 0.2 +
+            attentionAvg * 0.2
+          )
+        )
+      );
+
+      const detail: SessionDetail = {
+        postureScore,
+        eyeClosedMs: poseRes.eyeClosedMs,
+        eyeOpenMs: poseRes.eyeOpenMs,
+        badPostureRatio: poseRes.badPostureRatio,
+        blinkCount: poseRes.blinkCount,
+        durationMs: poseRes.durationMs,
+        unstableCount,
+        attentionAvg,
+        meditationAvg,
+        score: finalScore,
+      };
+
+      setSessionDetail(detail);
+      setLatestSessionResult(detail);
+    }
+  }, [timer.isFinished, stopSession, unstableCount, setLatestSessionResult, sessionDetail]);
+
+  // ✅ Meditation Auto-save on Finish → navigates to /reports
   useSaveMeditationReport({
     isFinished:       timer.isFinished,
     durationMin,
     totalRounds:      TOTAL_ROUNDS,
     theme,
-    unstableCount,
-    brainwaveMetrics: brainwave.brainwaveMetrics, // { attention, meditation, signal }
+    sessionDetail,
     onSaved: () => {
       music.stopMusic();
       navigate("/reports", { state: { isJustFinished: true } });
