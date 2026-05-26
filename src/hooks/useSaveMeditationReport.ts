@@ -1,16 +1,14 @@
 import { useEffect, useRef, useContext } from "react";
-//import { useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { UserContext } from "../contexts/userContextHelpers";
-import type { BrainwaveMetrics } from "./useMeditationLLM";
+import type { SessionDetail } from "../store/useMeditationStore";
 
 interface SaveReportParams {
   isFinished: boolean;
   durationMin: number;
   totalRounds: number;
   theme: string;
-  unstableCount: number;           // useMotionStability의 unstableCount
-  brainwaveMetrics: BrainwaveMetrics; // { attention, meditation, signal }
+  sessionDetail: SessionDetail | null;
   onSaved?: () => void;
 }
 
@@ -19,34 +17,23 @@ export function useSaveMeditationReport({
   durationMin,
   totalRounds,
   theme,
-  unstableCount,
-  brainwaveMetrics,
+  sessionDetail,
   onSaved,
 }: SaveReportParams) {
   const { user } = useContext(UserContext);
   const savedRef = useRef(false); // 중복 저장 방지
 
   useEffect(() => {
-    if (!isFinished || savedRef.current || !user || !supabase) return;
+    // isFinished가 참이고 sessionDetail이 준비되었을 때 진행
+    if (!isFinished || !sessionDetail || savedRef.current || !user || !supabase) return;
     savedRef.current = true;
 
     const save = async () => {
       try {
         const totalMinutes = durationMin * totalRounds;
-
-        // ── 점수 계산 ──────────────────────────────────────────
-        // 기본 70점
-        // + 안정도 보정: 자세 흐트러짐이 적을수록 최대 +20
-        // + 뇌파 명상도 보정: meditation 값이 높을수록 최대 +10
-        const stabilityBonus = Math.max(0, 20 - unstableCount * 2);
-        const meditationBonus = Math.min(
-          10,
-          Math.round((brainwaveMetrics.meditation / 100) * 10)
-        );
-        const score = Math.min(100, Math.max(0, 70 + stabilityBonus + meditationBonus));
+        const score = sessionDetail.score;
 
         // ── total_duration ──────────────────────────────────────
-        // ReportPage의 /(\d+)m/ 파싱에 맞는 형식
         const total_duration = `${totalMinutes}m 0s`;
 
         // ── trend ──────────────────────────────────────────────
@@ -116,57 +103,77 @@ export function useSaveMeditationReport({
 
         const rawDays = Array.from(daysMap.values());
         const maxMins = Math.max(...rawDays.map((d) => d.minutes), 30);
-        const graph_data = rawDays.map((d) => ({
+        const weeklyGraph = rawDays.map((d) => ({
           day: d.day,
           minutes: d.minutes,
           height: `${Math.max(10, Math.round((d.minutes / maxMins) * 100))}%`,
         }));
 
-        // ── AI 피드백 (Claude API) ──────────────────────────────
+        // ── AI 피드백 (Gemini API) ──────────────────────────────
         let ai_pattern =
-          `Your ${theme} session showed consistent engagement with ${score}% stability.`;
+          `이번 ${theme} 명상 세션에서 ${score}%의 안정도를 보여주셨습니다.`;
         let ai_recommendation =
-          `Continue with ${durationMin}-minute sessions to deepen your ${theme} practice.`;
+          `자세를 편안하게 유지하고, ${durationMin}분씩 꾸준히 명상을 이어가 보세요.`;
 
-        try {
-          const aiPrompt = `Meditation session summary:
-- Theme: ${theme}
-- Total time: ${totalMinutes} minutes (${durationMin}min × ${totalRounds} rounds)
-- Score: ${score}/100
-- Posture disruptions: ${unstableCount} times
-- Brainwave attention: ${brainwaveMetrics.attention}/100
-- Brainwave meditation: ${brainwaveMetrics.meditation}/100
-- Signal quality: ${brainwaveMetrics.signal} (0=best, 200=worst)
+        const apiKey = import.meta.env.VITE_AI_API_KEY;
+        if (apiKey) {
+          try {
+            const eyeClosedRatioPercent = sessionDetail.durationMs > 0
+              ? Math.round((sessionDetail.eyeClosedMs / sessionDetail.durationMs) * 100)
+              : 80;
 
-Based on this data, write a 1-2 sentence pattern observation and a 1-2 sentence recommendation.
+            const aiPrompt = `Meditation session summary:
+- Theme: ${theme} (명상 테마)
+- Total time: ${totalMinutes} minutes
+- Composite Score: ${score}/100 (종합 명상 점수)
+- Posture score: ${sessionDetail.postureScore}/100 (자세 안정성 점수)
+- Posture disruptions: ${sessionDetail.unstableCount} times (자세 흐트러짐 횟수)
+- Eye closed duration ratio: ${eyeClosedRatioPercent}% (눈감음 비율)
+- Blinks count: ${sessionDetail.blinkCount} times (눈 깜빡임 횟수)
+- Brainwave attention: ${sessionDetail.attentionAvg}/100 (집중도 평균)
+- Brainwave meditation: ${sessionDetail.meditationAvg}/100 (명상도 평균)
+
+Based on this data, write a 1-2 sentence pattern observation ("pattern") and a 1-2 sentence recommendation ("recommendation") in Korean.
+For pattern, focus on their brainwave stability, posture consistency, and eye closure.
+For recommendation, give actionable tips to improve focus or relaxation.
 Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
 
-          const aiRes = await fetch("https://api.anthropic.com/v1/messages", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              model: "claude-sonnet-4-20250514",
-              max_tokens: 300,
-              messages: [{ role: "user", content: aiPrompt }],
-            }),
-          });
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
 
-          if (aiRes.ok) {
-            const aiData = await aiRes.json();
-            const text = aiData.content?.[0]?.text ?? "";
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-              const parsed = JSON.parse(jsonMatch[0]);
-              if (parsed.pattern)       ai_pattern       = parsed.pattern;
-              if (parsed.recommendation) ai_recommendation = parsed.recommendation;
+            const response = await fetch(endpoint, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ parts: [{ text: aiPrompt }] }],
+                generationConfig: {
+                  temperature: 0.7,
+                  maxOutputTokens: 500,
+                  responseMimeType: "application/json",
+                },
+              }),
+            });
+
+            if (response.ok) {
+              const resData = await response.json();
+              const text = resData.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+              const jsonMatch = text.match(/\{[\s\S]*\}/);
+              if (jsonMatch) {
+                const parsed = JSON.parse(jsonMatch[0]);
+                if (parsed.pattern)       ai_pattern       = parsed.pattern;
+                if (parsed.recommendation) ai_recommendation = parsed.recommendation;
+              }
             }
+          } catch (e) {
+            console.warn("❌ Gemini feedback creation failed:", e);
           }
-        } catch (e) {
-          // AI 피드백 실패해도 저장 진행
-          console.warn("AI feedback skipped:", e);
         }
 
         // ── Supabase INSERT ─────────────────────────────────────
+        const graph_payload = {
+          weekly_graph: weeklyGraph,
+          session_detail: sessionDetail,
+        };
+
         const { error } = await supabase!.from("meditation_reports").insert({
           user_id:             user.id,
           score,
@@ -174,22 +181,21 @@ Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
           total_duration,
           sessions_completed:  totalRounds,
           current_streak,
-          graph_data,
+          graph_data:          graph_payload,
           ai_pattern,
           ai_recommendation,
           created_at:          new Date().toISOString(),
         });
 
         if (error) throw error;
-        console.log("✅ Meditation report saved");
+        console.log("✅ Meditation report saved successfully");
       } catch (err) {
         console.error("❌ Save failed:", err);
       } finally {
-        // 저장 성공·실패 모두 콜백 호출 (페이지 이동)
         onSaved?.();
       }
     };
 
     save();
-  }, [isFinished]); // isFinished 변화 시 딱 한 번
+  }, [isFinished, sessionDetail]);
 }
