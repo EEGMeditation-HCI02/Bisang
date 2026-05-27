@@ -112,7 +112,7 @@ export default function ProfilePage() {
         const { data, error } = await supabase
           .from("profiles")
           // audio_guidance 추가
-          .select("name, age_group, primary_focus, avatar_url, streak_days, sync_active, audio_guidance")
+          .select("name, age_group, primary_focus, avatar_url, current_streak, sync_active, audio_guidance")
           .eq("id", user.id)
           .single();
 
@@ -123,7 +123,7 @@ export default function ProfilePage() {
           if (data.age_group) setAge(data.age_group);
           if (data.primary_focus) setFocus(data.primary_focus);
           if (data.avatar_url) setAvatarUrl(data.avatar_url);
-          if (data.streak_days !== null && data.streak_days !== undefined) setStreak(`${data.streak_days} Days`);
+          if (data.current_streak !== null && data.current_streak !== undefined) setStreak(`${data.current_streak} Days`);
           if (data.sync_active !== null && data.sync_active !== undefined) setSyncStatus(data.sync_active ? "Active" : "Inactive");
           // DB에 오디오 세팅이 있으면 덮어쓰기
           if (data.audio_guidance) setAudio(data.audio_guidance);
@@ -359,7 +359,7 @@ export default function ProfilePage() {
                 </button>
               </div>
               <h2 className={styles.profileName}>{name}</h2>
-              <p className={styles.profileRole}>Master Practitioner • 428 Hours</p>
+              <p className={styles.profileRole}>Have a peaceful day, {name}!</p>
             </div>
 
             <div className={styles.statsDivider} />
