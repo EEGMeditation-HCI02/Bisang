@@ -85,19 +85,18 @@ export default function MeditationSession() {
     const currentText = guidance.guidances[guidance.guidanceIndex];
     if (!currentText) return;
 
+    if (currentTtsAudioRef.current && !currentTtsAudioRef.current.paused) return; // ← 추가
+
     let isSubscribed = true;
 
     const playGuidanceAudio = async () => {
       try {
-        // 기존 TTS가 아직 재생 중이라면 겹치지 않게 중지
         if (currentTtsAudioRef.current) {
           currentTtsAudioRef.current.pause();
           currentTtsAudioRef.current.currentTime = 0;
         }
 
         const audio = await playDynamicGuidance(currentText, "default");
-
-        // 비동기 처리 중 컴포넌트 언마운트 시 재생 방지
         if (!isSubscribed) return;
 
         currentTtsAudioRef.current = audio;
@@ -109,14 +108,13 @@ export default function MeditationSession() {
 
     playGuidanceAudio();
 
-    // 클린업: 다음 멘트로 넘어가거나 화면 이탈 시 오디오 정리
     return () => {
       isSubscribed = false;
       if (currentTtsAudioRef.current) {
         currentTtsAudioRef.current.pause();
       }
     };
-  }, [guidance.guidanceIndex, guidance.guidances, timer.isFinished, timer.isPlaying, guidance.guidanceLoading]);
+  }, [guidance.guidanceIndex, timer.isFinished, timer.isPlaying, guidance.guidanceLoading]); 
 
   // ── On Meditation Finished: Stop Analysis and Calculate Scores ──
   useEffect(() => {
