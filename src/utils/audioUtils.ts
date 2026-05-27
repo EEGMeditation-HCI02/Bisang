@@ -1,6 +1,6 @@
 export const playDynamicGuidance = async (text: string, voiceId: string): Promise<HTMLAudioElement> => {
     try {
-        const response = await fetch("http://localhost:8000/api/tts", {
+        const response = await fetch("https://bisang-production.up.railway.app/api/tts", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ text, voice_id: voiceId }),

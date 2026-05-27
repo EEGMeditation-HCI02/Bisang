@@ -27,7 +27,7 @@ export function useBrainwaveConnection(): UseBrainwaveReturn {
 
     const connectBrainwave = () => {
       try {
-        const ws = new WebSocket("ws://localhost:8080");
+        const ws = new WebSocket("ws://bisang-production-747f.up.railway.app/");
 
         ws.onopen = () => {
           console.log("🧠 뇌파 센서 연결됨");

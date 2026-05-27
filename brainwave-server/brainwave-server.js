@@ -5,7 +5,8 @@
  */
 import { WebSocketServer } from "ws";
 
-const PORT = 8080;
+// const PORT = 8080;
+const PORT = process.env.PORT || 8080;
 const wss = new WebSocketServer({ port: PORT });
 
 console.log(`🧠 뇌파 센서 서버 시작: ws://localhost:${PORT}`);
