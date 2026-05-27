@@ -22,12 +22,12 @@ class TTSRequest(BaseModel):
 
 # 6가지 옵션 매핑 (선히, 인준) -> 원어민 음성 추가
 VOICE_MAP = {
-    "Sunhi": {"voice": "ko-KR-SunHiNeural", "rate": "+0%", "pitch": "+0Hz"},
-    "Aria": {"voice": "en-US-AriaNeural", "rate": "+0%", "pitch": "+0Hz"},
-    "Jenny": {"voice": "en-US-JennyNeural", "rate": "+0%", "pitch": "+0Hz"},
-    "Injoon": {"voice": "ko-KR-InJoonNeural", "rate": "+0%", "pitch": "+0Hz"},
-    "Christopher": {"voice": "en-US-ChristopherNeural", "rate": "+0%", "pitch": "+0Hz"},
-    "Guy": {"voice": "en-US-GuyNeural", "rate": "+0%", "pitch": "+0Hz"},
+    "Sunhi": {"voice": "ko-KR-SunHiNeural", "rate": "-10%", "pitch": "+0Hz"},
+    "Aria": {"voice": "en-US-AriaNeural", "rate": "-10%", "pitch": "+0Hz"},
+    "Jenny": {"voice": "en-US-JennyNeural", "rate": "-10%", "pitch": "+0Hz"},
+    "Injoon": {"voice": "ko-KR-InJoonNeural", "rate": "-10%", "pitch": "+0Hz"},
+    "Christopher": {"voice": "en-US-ChristopherNeural", "rate": "-10%", "pitch": "+0Hz"},
+    "Guy": {"voice": "en-US-GuyNeural", "rate": "-10%", "pitch": "+0Hz"},
     # "sunhi-calm": {"voice": "ko-KR-SunHiNeural", "rate": "+0%", "pitch": "+0Hz"},
     # "sunhi-slow": {"voice": "ko-KR-SunHiNeural", "rate": "-15%", "pitch": "-5Hz"},
     # "sunhi-deep": {"voice": "ko-KR-SunHiNeural", "rate": "-10%", "pitch": "-10Hz"},
