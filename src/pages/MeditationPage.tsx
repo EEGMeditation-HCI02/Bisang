@@ -21,7 +21,6 @@ import {
 } from "../constants/meditationConstants";
 import { playDynamicGuidance } from "../utils/audioUtils";
 
-import TestSaveButton from "../components/TestSaveButton"; // 테스트용
 
 export default function MeditationSession() {
   const navigate = useNavigate();
@@ -203,8 +202,6 @@ export default function MeditationSession() {
           <path d="M19 12H5M12 5l-7 7 7 7" />
         </svg>
       </button>
-
-      <TestSaveButton />
 
       {/* Music toggle */}
       <button
