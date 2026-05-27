@@ -41,7 +41,7 @@ export default function AudioGuidanceModal({ isOpen, onClose, currentSelection, 
 
         try {
             // Request TTS generation from python server
-            const sampleText = "Take a deep breath in... and slowly breathe out. Welcome to your sanctuary.";
+            const sampleText = "Hello. Let's begin our session together.";
             const newAudio = await playDynamicGuidance(sampleText, opt.id);
 
             newAudio.onended = () => setPlayingId(null);
