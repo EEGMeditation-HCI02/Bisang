@@ -1,4 +1,5 @@
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect } from "react"; 
 import "./App.css";
 
 import LandingPage from "./pages/LandingPage";
@@ -35,10 +36,21 @@ function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
+        <ScrollToTop />
         <Layout>
           <Routes>
             <Route path="/" element={<LandingPage />} />
