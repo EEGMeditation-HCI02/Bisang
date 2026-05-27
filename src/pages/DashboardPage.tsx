@@ -39,7 +39,7 @@ export default function Dashboard() {
                 </p>
               </div>
               <div className={styles.meditationPlayer}>
-                <button className={styles.playBtn} aria-label="Play" onClick={() => navigate('/meditationsetup')}>
+                <button className={styles.playBtn} aria-label="Play" onClick={() => navigate('/testguide')}>
                   {/* Play icon */}
                   <svg
                     width="28"
@@ -115,7 +115,6 @@ export default function Dashboard() {
                 indicates a calm state."
               </p>
             </div>
-            <button className={styles.linkBtn}>View Details</button>
           </div>
 
           {/* My Meditation Report */}
@@ -149,7 +148,9 @@ export default function Dashboard() {
               </div>
             </div>
 
-            <button className={styles.linkBtn}>Full Report</button>
+            <button className={styles.linkBtn} onClick={() => navigate('/reports')}>
+              Full Report
+            </button>
           </div>
         </div>
       </main>
