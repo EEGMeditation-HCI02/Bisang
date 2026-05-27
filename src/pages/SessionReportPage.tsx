@@ -111,6 +111,11 @@ export default function SessionReportPage({ toggleNode, hideHeader }: SessionRep
       : 80
     : 0;
 
+  const eyeClosedMs = detail?.eyeClosedMs ?? 0;
+  const focusTotalSecs = Math.round(eyeClosedMs / 1000);
+  const focusMins = Math.floor(focusTotalSecs / 60);
+  const focusSecs = focusTotalSecs % 60;
+
   const headerContent = hideHeader ? null : (
     <header className={styles.header}>
       <div className={styles.headerLeft}>
@@ -164,8 +169,11 @@ export default function SessionReportPage({ toggleNode, hideHeader }: SessionRep
         <div className={styles.scoreCard}>
           <p className={styles.subLabel}>MEDITATION SCORE</p>
           <div className={styles.scoreVisual}>
-            <h2 className={styles.scoreValue}>{score}%</h2>
-            <p className={styles.scoreLabel}>STABILITY</p>
+            <h2 className={styles.scoreValue}>
+              {score}
+              <span style={{ fontSize: "28px", opacity: 0.6, fontWeight: 500, marginLeft: "4px" }}>/100</span>
+            </h2>
+            <p className={styles.scoreLabel}>POINTS</p>
           </div>
         </div>
 
@@ -232,9 +240,9 @@ export default function SessionReportPage({ toggleNode, hideHeader }: SessionRep
             </div>
             <p className={styles.metricTitle}>Focus Duration</p>
             <div className={styles.metricValueWrap}>
-              <p className={styles.metricValue}>{duration.totalMins}</p>
+              <p className={styles.metricValue}>{focusMins}</p>
               <span className={styles.metricUnit}>m</span>
-              <p className={styles.metricValue} style={{ marginLeft: "8px" }}>{duration.secs}</p>
+              <p className={styles.metricValue} style={{ marginLeft: "8px" }}>{focusSecs}</p>
               <span className={styles.metricUnit}>s</span>
               <span style={{ fontSize: "14px", color: "#625F57", marginLeft: "auto", fontWeight: "bold" }}>
                 / {duration.display}
@@ -273,7 +281,7 @@ export default function SessionReportPage({ toggleNode, hideHeader }: SessionRep
                 </svg>
                 <span className={styles.detailTag}>Posture Stability</span>
               </div>
-              <h3 className={styles.detailTitle}>자세 안정도</h3>
+              <h3 className={styles.detailTitle}>Posture Stability</h3>
               <div className={styles.detailValueWrap}>
                 <p className={styles.detailValue}>{detail.postureScore}</p>
                 <span className={styles.detailUnit}>%</span>
@@ -282,7 +290,7 @@ export default function SessionReportPage({ toggleNode, hideHeader }: SessionRep
                 <div className={styles.progressBarFill} style={{ width: `${detail.postureScore}%` }} />
               </div>
               <p className={styles.detailSubtext}>
-                자세 흔들림/이탈 감지: <span className={styles.highlightText}>{detail.unstableCount}회</span>
+                Posture Instability Detected: <span className={styles.highlightText}>{detail.unstableCount} times</span>
               </p>
             </div>
 
@@ -295,7 +303,7 @@ export default function SessionReportPage({ toggleNode, hideHeader }: SessionRep
                 </svg>
                 <span className={styles.detailTag}>Eye Closure</span>
               </div>
-              <h3 className={styles.detailTitle}>눈 감음 (몰입 비율)</h3>
+              <h3 className={styles.detailTitle}>Eye Closure (Engagement Ratio)</h3>
               <div className={styles.detailValueWrap}>
                 <p className={styles.detailValue}>{eyeClosedRatioPercent}</p>
                 <span className={styles.detailUnit}>%</span>
@@ -304,7 +312,7 @@ export default function SessionReportPage({ toggleNode, hideHeader }: SessionRep
                 <div className={styles.progressBarFill} style={{ width: `${eyeClosedRatioPercent}%` }} />
               </div>
               <p className={styles.detailSubtext}>
-                총 눈감은 시간: <span className={styles.highlightText}>{formatMs(detail.eyeClosedMs)}</span> / 눈 깜빡임: <span className={styles.highlightText}>{detail.blinkCount}회</span>
+                Total Eye Closed: <span className={styles.highlightText}>{formatMs(detail.eyeClosedMs)}</span> / Blinks: <span className={styles.highlightText}>{detail.blinkCount} times</span>
               </p>
             </div>
 
@@ -316,11 +324,11 @@ export default function SessionReportPage({ toggleNode, hideHeader }: SessionRep
                 </svg>
                 <span className={styles.detailTag}>Brainwave Depth</span>
               </div>
-              <h3 className={styles.detailTitle}>뇌파 활성도 분석</h3>
+              <h3 className={styles.detailTitle}>Brainwave Activity Analysis</h3>
               <div className={styles.brainwaveRows}>
                 <div className={styles.brainwaveRow}>
                   <div className={styles.brainwaveLabelWrap}>
-                    <span>평균 집중도 (Attention)</span>
+                    <span>Average Attention</span>
                     <span className={styles.brainwaveValue}>{detail.attentionAvg}%</span>
                   </div>
                   <div className={styles.miniBarBg}>
@@ -329,7 +337,7 @@ export default function SessionReportPage({ toggleNode, hideHeader }: SessionRep
                 </div>
                 <div className={styles.brainwaveRow}>
                   <div className={styles.brainwaveLabelWrap}>
-                    <span>평균 명상도 (Meditation)</span>
+                    <span>Average Meditation</span>
                     <span className={styles.brainwaveValue}>{detail.meditationAvg}%</span>
                   </div>
                   <div className={styles.miniBarBg}>

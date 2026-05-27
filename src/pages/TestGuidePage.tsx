@@ -238,16 +238,7 @@ export default function TestGuidePage() {
     };
   }, []);
 
-  // 연결 완료 후 MeditationSetupPage로 이동
-  useEffect(() => {
-    if (connectionStatus === "connected") {
-      const timer = setTimeout(() => {
-        navigate("/meditationsetup");
-      }, 2000); // 2초 후 이동
 
-      return () => clearTimeout(timer);
-    }
-  }, [connectionStatus, navigate]);
 
   const handleConnect = async () => {
     if (connectionStatus === "connected") {
@@ -271,7 +262,7 @@ export default function TestGuidePage() {
 
     if (!("serial" in navigator)) {
       alert(
-        "이 브라우저는 Web Serial API를 지원하지 않습니다. Chrome 또는 Edge 브라우저를 사용해 주세요.",
+        "This browser does not support the Web Serial API. Please use Chrome or Edge.",
       );
       return;
     }
@@ -488,20 +479,44 @@ export default function TestGuidePage() {
 
         {/* Actions */}
         <div className={styles.actions}>
-          <button
-            className={styles.btnPrimary}
-            onClick={handleConnect}
-            disabled={isMocking}
-          >
-            {connectionStatus === "connecting"
-              ? "Connecting..."
-              : connectionStatus === "connected"
-                ? "Disconnect"
-                : "Connect Device"}
-          </button>
-          <button className={styles.btnGhost} onClick={handleMockMode}>
-            {isMocking ? "Exit Demo Mode" : "Start Demo Mode"}
-          </button>
+          {connectionStatus === "connected" || isMocking ? (
+            <>
+              <button
+                className={styles.btnPrimary}
+                onClick={() => navigate("/meditationsetup")}
+              >
+                Proceed to Setup
+              </button>
+              {connectionStatus === "connected" ? (
+                <button className={styles.btnGhost} onClick={handleConnect}>
+                  Disconnect
+                </button>
+              ) : (
+                <button className={styles.btnGhost} onClick={handleMockMode}>
+                  Exit Demo Mode
+                </button>
+              )}
+            </>
+          ) : (
+            <>
+              <button
+                className={styles.btnPrimary}
+                onClick={handleConnect}
+                disabled={connectionStatus === "connecting"}
+              >
+                {connectionStatus === "connecting" ? "Connecting..." : "Connect Device"}
+              </button>
+              <button className={styles.btnGhost} onClick={handleMockMode}>
+                Start Demo Mode
+              </button>
+              <button
+                className={styles.btnGhost}
+                onClick={() => navigate("/meditationsetup")}
+              >
+                Skip to Meditation
+              </button>
+            </>
+          )}
         </div>
       </div>
     </main>

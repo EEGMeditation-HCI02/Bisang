@@ -40,8 +40,8 @@ export default function AudioGuidanceModal({ isOpen, onClose, currentSelection, 
         setIsLoading(opt.id);
 
         try {
-            // 파이썬 서버에 TTS 생성을 요청! (원하는 샘플 멘트 작성)
-            const sampleText = "크게 숨을 들이마시고... 천천히 내쉬어보세요. 당신만의 안식처에 오신 것을 환영합니다.";
+            // Request TTS generation from python server
+            const sampleText = "Take a deep breath in... and slowly breathe out. Welcome to your sanctuary.";
             const newAudio = await playDynamicGuidance(sampleText, opt.id);
 
             newAudio.onended = () => setPlayingId(null);
@@ -50,7 +50,7 @@ export default function AudioGuidanceModal({ isOpen, onClose, currentSelection, 
             audioRef.current = newAudio;
             setPlayingId(opt.id);
         } catch (err) {
-            alert("서버 연결에 실패했습니다. 백엔드 서버가 켜져 있는지 확인해주세요.");
+            alert("Failed to connect to the server. Please check if the backend server is running.");
         } finally {
             setIsLoading(null);
         }

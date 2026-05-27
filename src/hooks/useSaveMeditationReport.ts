@@ -24,12 +24,17 @@ export function useSaveMeditationReport({
   const savedRef = useRef(false); // 중복 저장 방지
 
   useEffect(() => {
-    // isFinished가 참이고 sessionDetail이 준비되었을 때 진행
-    if (!isFinished || !sessionDetail || savedRef.current || !user || !supabase) return;
+    // Proceed once the session is finished and sessionDetail is available
+    if (!isFinished || !sessionDetail || savedRef.current) return;
     savedRef.current = true;
 
     const save = async () => {
       try {
+        if (!user || !supabase) {
+          console.warn("⚠️ User not logged in or Supabase not connected. Skipping DB save, redirecting to reports.");
+          return;
+        }
+
         const totalMinutes = durationMin * totalRounds;
         const score = sessionDetail.score;
 
@@ -109,11 +114,11 @@ export function useSaveMeditationReport({
           height: `${Math.max(10, Math.round((d.minutes / maxMins) * 100))}%`,
         }));
 
-        // ── AI 피드백 (Gemini API) ──────────────────────────────
+        // ── AI Feedback (Gemini API) ──────────────────────────────
         let ai_pattern =
-          `이번 ${theme} 명상 세션에서 ${score}%의 안정도를 보여주셨습니다.`;
+          `You achieved a meditation score of ${score} points in this ${theme} meditation session.`;
         let ai_recommendation =
-          `자세를 편안하게 유지하고, ${durationMin}분씩 꾸준히 명상을 이어가 보세요.`;
+          `Try to maintain a comfortable posture and continue meditating for ${durationMin} minutes consistently.`;
 
         const apiKey = import.meta.env.VITE_AI_API_KEY;
         if (apiKey) {
@@ -123,17 +128,17 @@ export function useSaveMeditationReport({
               : 80;
 
             const aiPrompt = `Meditation session summary:
-- Theme: ${theme} (명상 테마)
+- Theme: ${theme} (Meditation Theme)
 - Total time: ${totalMinutes} minutes
-- Composite Score: ${score}/100 (종합 명상 점수)
-- Posture score: ${sessionDetail.postureScore}/100 (자세 안정성 점수)
-- Posture disruptions: ${sessionDetail.unstableCount} times (자세 흐트러짐 횟수)
-- Eye closed duration ratio: ${eyeClosedRatioPercent}% (눈감음 비율)
-- Blinks count: ${sessionDetail.blinkCount} times (눈 깜빡임 횟수)
-- Brainwave attention: ${sessionDetail.attentionAvg}/100 (집중도 평균)
-- Brainwave meditation: ${sessionDetail.meditationAvg}/100 (명상도 평균)
+- Composite Score: ${score}/100 (Overall Meditation Score)
+- Posture score: ${sessionDetail.postureScore}/100 (Posture Stability Score)
+- Posture disruptions: ${sessionDetail.unstableCount} times (Posture Disruptions)
+- Eye closed duration ratio: ${eyeClosedRatioPercent}% (Eye Closure Ratio)
+- Blinks count: ${sessionDetail.blinkCount} times (Blink Count)
+- Brainwave attention: ${sessionDetail.attentionAvg}/100 (Attention Average)
+- Brainwave meditation: ${sessionDetail.meditationAvg}/100 (Meditation Average)
 
-Based on this data, write a 1-2 sentence pattern observation ("pattern") and a 1-2 sentence recommendation ("recommendation") in Korean.
+Based on this data, write a 1-2 sentence pattern observation ("pattern") and a 1-2 sentence recommendation ("recommendation") in English.
 For pattern, focus on their brainwave stability, posture consistency, and eye closure.
 For recommendation, give actionable tips to improve focus or relaxation.
 Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
@@ -197,5 +202,5 @@ Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
     };
 
     save();
-  }, [isFinished, sessionDetail]);
+  }, [isFinished, sessionDetail, user, supabase, durationMin, totalRounds, theme, onSaved]);
 }

@@ -39,7 +39,7 @@ export default function Dashboard() {
                 </p>
               </div>
               <div className={styles.meditationPlayer}>
-                <button className={styles.playBtn} aria-label="Play" onClick={() => navigate('/meditationsetup')}>
+                <button className={styles.playBtn} aria-label="Play" onClick={() => navigate('/testguide')}>
                   {/* Play icon */}
                   <svg
                     width="28"

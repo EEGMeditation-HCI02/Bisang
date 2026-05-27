@@ -211,7 +211,7 @@ Return ONLY the JSON, no other text.`;
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     try {
       console.log(
-        `🔄 AI 멘트 생성 중... (${theme.koreanName}) [시도 ${attempt + 1}/${MAX_RETRIES}]`,
+        `🔄 Generating AI guidance... (${theme.label}) [Attempt ${attempt + 1}/${MAX_RETRIES}]`,
       );
 
       const response = await fetch(endpoint, {

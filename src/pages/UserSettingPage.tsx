@@ -102,9 +102,9 @@ export default function UserSettingPage() {
     console.log("upsert result:", { error, data });
 
     if (error) {
-      alert("저장 실패: " + error.message);
+      alert("Save failed: " + error.message);
     } else {
-      alert("저장 완료!");
+      alert("Save completed!");
       navigate("/dashboard");
     }
   };
