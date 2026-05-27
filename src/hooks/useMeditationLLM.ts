@@ -171,7 +171,7 @@ export async function generateMeditationGuidances(
   }
 
   const theme = THEMES[themeType] || THEMES["calm"];
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
   const systemPrompt = `You are an experienced meditation guide.
 Write calm, gentle, and supportive meditation phrases in English.
