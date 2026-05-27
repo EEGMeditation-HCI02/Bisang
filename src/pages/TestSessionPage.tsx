@@ -196,6 +196,13 @@ export default function TestSessionPage() {
         </svg>
       </button>
 
+      <div className={styles.brainwaveStatusWrap}>
+        <BrainwaveStatus
+          connected={brainwave.brainwaveConnected}
+          metrics={brainwave.brainwaveMetrics}
+        />
+      </div>
+
       {/* Music toggle */}
       <button
         className={styles.musicToggleBtn}
@@ -231,13 +238,7 @@ export default function TestSessionPage() {
 
         <div className={styles.card}>
           <header className={styles.cardHeader}>
-            <div className={styles.headerContent}>
-              <h1 className={styles.title}>Test Session</h1>
-              <BrainwaveStatus
-                connected={brainwave.brainwaveConnected}
-                metrics={brainwave.brainwaveMetrics}
-              />
-            </div>
+            <h1 className={styles.title}>Test Session</h1>
           </header>
 
           <RoundIndicator

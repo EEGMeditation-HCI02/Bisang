@@ -260,6 +260,14 @@ export default function MeditationSession() {
         </svg>
       </button>
 
+      {/* ✅ BrainwaveStatus — 좌측 하단 고정 */}
+      <div className={styles.brainwaveStatusWrap}>
+        <BrainwaveStatus
+          connected={brainwave.brainwaveConnected}
+          metrics={brainwave.brainwaveMetrics}
+        />
+      </div>
+
       {/* Music toggle */}
       <button
         className={styles.musicToggleBtn}
@@ -307,10 +315,6 @@ export default function MeditationSession() {
           <header className={styles.cardHeader}>
             <div className={styles.headerContent}>
               <h1 className={styles.title}>Meditation</h1>
-              <BrainwaveStatus
-                connected={brainwave.brainwaveConnected}
-                metrics={brainwave.brainwaveMetrics}
-              />
             </div>
           </header>
 
@@ -364,12 +368,14 @@ export default function MeditationSession() {
           onClick={() => timer.goToRound(timer.currentRound + 1)}
           disabled={!timer.canNext}
         >
-          <span className={styles.sideBtnLabel}>Round {timer.currentRound + 1}</span>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
             stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M9 18l6-6-6-6" />
           </svg>
+          <span className={styles.sideBtnLabel}>Round {timer.currentRound + 1}</span>
         </button>
+
+        
       </div>
     </main>
   );
