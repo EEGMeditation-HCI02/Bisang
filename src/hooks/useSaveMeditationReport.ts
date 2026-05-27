@@ -24,8 +24,11 @@ export function useSaveMeditationReport({
   const savedRef = useRef(false); // 중복 저장 방지
 
   useEffect(() => {
-    // isFinished가 참이고 sessionDetail이 준비되었을 때 진행
-    if (!isFinished || !sessionDetail || savedRef.current || !user || !supabase) return;
+    // 1. 전역 supabase 객체를 내부 로컬 상수로 할당하여 TypeScript가 안전하게 추론하도록 만듭니다.
+    const client = supabase;
+
+    // 2. 할당된 client가 null인지 검사하여 하단 비동기 로직에서의 'possibly null' 에러를 원천 차단합니다.
+    if (!isFinished || !sessionDetail || savedRef.current || !user || !client) return;
     savedRef.current = true;
 
     const save = async () => {
@@ -46,8 +49,8 @@ export function useSaveMeditationReport({
         const today = new Date().toISOString().split("T")[0];
         const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
 
-        // 1. 프로필에서 기존 스트릭과 마지막 세션 날짜 가져오기 (단일 진실 공급원)
-        const { data: profile } = await supabase
+        // 프로필에서 기존 스트릭과 마지막 세션 날짜 가져오기 (단일 진실 공급원)
+        const { data: profile } = await client
           .from("profiles")
           .select("current_streak, last_session_date")
           .eq("id", user.id)
@@ -80,7 +83,7 @@ export function useSaveMeditationReport({
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
         sevenDaysAgo.setHours(0, 0, 0, 0);
 
-        const { data: pastData } = await supabase
+        const { data: pastData } = await client
           .from("meditation_reports")
           .select("created_at, total_duration")
           .eq("user_id", user.id)
@@ -186,23 +189,21 @@ Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
           session_detail: sessionDetail,
         };
 
-        // 리포트 저장과 프로필 데이터 업데이트를 동시에 진행합니다.
         const [reportResult, profileResult] = await Promise.all([
-          
-          supabase.from("meditation_reports").insert({
+          client.from("meditation_reports").insert({
             user_id: user.id,
             score,
             trend,
             total_duration,
             sessions_completed: totalRounds,
-            current_streak: current_streak_str, // 리포트에는 기존처럼 "X Days" 형식 유지
+            current_streak: current_streak_str,
             graph_data: graph_payload,
             ai_pattern,
             ai_recommendation,
             created_at: new Date().toISOString(),
           }),
-          supabase.from("profiles").update({
-            current_streak: newStreak,  // 프로필에는 숫자 형식으로 저장
+          client.from("profiles").update({
+            current_streak: newStreak,
             last_session_date: today
           }).eq("id", user.id)
         ]);
