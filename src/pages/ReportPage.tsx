@@ -5,9 +5,9 @@ import { supabase } from "../lib/supabaseClient";
 import { UserContext } from "../contexts/userContextHelpers";
 import SessionReportPage from "./SessionReportPage";
 
-const DUMMY_DATA = {
-    score: 87,
-    trend: "+4 pts this week",
+const EMPTY_STATE = {
+    score: 0,
+    trend: "No data this week",
     graphData: [
         { day: "MON", minutes: 0, height: "10%" },
         { day: "TUE", minutes: 0, height: "10%" },
@@ -18,8 +18,8 @@ const DUMMY_DATA = {
         { day: "SUN", minutes: 0, height: "10%" },
     ],
     aiFeedback: {
-        pattern: "Morning sessions yield 20% faster entry into Alpha states compared to evenings.",
-        recommendation: "Increase breathwork duration before evening sessions to improve transition time."
+        pattern: "There are no meditation records this week.",
+        recommendation: "Start a new meditation session to analyze your brainwave data."
     },
     stats: {
         duration: "0h 0m",
@@ -32,7 +32,6 @@ export default function ReportPage() {
     const { user } = useContext(UserContext);
     const location = useLocation();
 
-    // 명상 끝나고 넘어온 거면 true, 헤더에서 그냥 누른 거면 undefined
     const isJustFinished = location.state?.isJustFinished;
 
     const themeKey = location.state?.theme || "meditation";
@@ -51,7 +50,7 @@ export default function ReportPage() {
         minute: "2-digit",
     });
 
-    const [reportData, setReportData] = useState(DUMMY_DATA);
+    const [reportData, setReportData] = useState(EMPTY_STATE);
     const [activeTab, setActiveTab] = useState(isJustFinished ? "today" : "Weekly");
 
     useEffect(() => {
@@ -71,44 +70,58 @@ export default function ReportPage() {
 
                 if (error) throw error;
 
+                // 1. 기본 일주일 치 틀(Map) 만들기
+                const daysMap = new Map();
+                const today = new Date();
+                for (let i = 6; i >= 0; i--) {
+                    const d = new Date(today);
+                    d.setDate(d.getDate() - i);
+                    const dateString = d.toISOString().split('T')[0];
+                    const dayName = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                    daysMap.set(dateString, { day: dayName, minutes: 0 });
+                }
+
+                // 2. 데이터가 있을 경우에만 덮어쓰기
                 if (data && data.length > 0) {
-                    const daysMap = new Map();
-                    const today = new Date();
-
-                    for (let i = 6; i >= 0; i--) {
-                        const d = new Date(today);
-                        d.setDate(d.getDate() - i);
-                        const dateString = d.toISOString().split('T')[0];
-                        const dayName = d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
-                        daysMap.set(dateString, { day: dayName, minutes: 0 });
-                    }
-
                     let totalScore = 0;
+                    let validScoreCount = 0;
                     let totalMinutes = 0;
 
                     data.forEach((row) => {
                         const rowDate = new Date(row.created_at).toISOString().split('T')[0];
-                        if (daysMap.has(rowDate)) {
-                            let mins = 0;
-                            if (row.total_duration) {
-                                const minMatch = row.total_duration.match(/(\d+)m/);
-                                if (minMatch) mins = parseInt(minMatch[1], 10);
-                            }
-                            daysMap.get(rowDate).minutes += mins;
-                            totalMinutes += mins;
+
+                        // 시간 계산 (그래프 및 전체 통계용)
+                        let mins = 0;
+                        if (row.total_duration) {
+                            const minMatch = row.total_duration.match(/(\d+)m/);
+                            if (minMatch) mins = parseInt(minMatch[1], 10);
                         }
-                        totalScore += (row.score || 0);
+                        totalMinutes += mins;
+
+                        // 요일별 시간에 누적
+                        if (daysMap.has(rowDate)) {
+                            daysMap.get(rowDate).minutes += mins;
+                        }
+
+                        // 점수 누적 (0점 제외한 유효 세션만)
+                        const sessionScore = row.score || 0;
+                        if (sessionScore > 0) {
+                            totalScore += sessionScore;
+                            validScoreCount += 1;
+                        }
                     });
 
                     const rawDays = Array.from(daysMap.values());
                     const maxMins = Math.max(...rawDays.map(d => d.minutes), 30);
+
+                    // 그래프 데이터 매핑 (다시 시간 단위로 복원)
                     const formattedGraphData = rawDays.map(d => ({
                         day: d.day,
                         minutes: d.minutes,
                         height: `${Math.max(10, Math.round((d.minutes / maxMins) * 100))}%`
                     }));
 
-                    const avgScore = Math.round(totalScore / data.length);
+                    const avgScore = validScoreCount > 0 ? Math.round(totalScore / validScoreCount) : 0;
                     const hours = Math.floor(totalMinutes / 60);
                     const remainderMins = totalMinutes % 60;
                     const durationStr = hours > 0 ? `${hours}h ${remainderMins}m` : `${remainderMins}m`;
@@ -117,17 +130,28 @@ export default function ReportPage() {
 
                     setReportData({
                         score: avgScore,
-                        trend: "Steady progress",
+                        trend: avgScore > 0 ? "Steady progress" : "No recent data",
                         graphData: formattedGraphData,
                         aiFeedback: {
-                            pattern: latestSession?.ai_pattern || DUMMY_DATA.aiFeedback.pattern,
-                            recommendation: latestSession?.ai_recommendation || DUMMY_DATA.aiFeedback.recommendation
+                            pattern: latestSession?.ai_pattern || "Sufficient data was not collected.",
+                            recommendation: latestSession?.ai_recommendation || "AI feedback is provided when you conduct a meditation session."
                         },
                         stats: {
                             duration: durationStr,
                             sessions: data.length,
-                            streak: latestSession?.current_streak || DUMMY_DATA.stats.streak
+                            streak: latestSession?.current_streak || "0 Days"
                         }
+                    });
+                } else {
+                    // 데이터가 없을 경우 (DUMMY 데이터 대신 실제 빈 화면에 맞는 세팅)
+                    const rawDays = Array.from(daysMap.values());
+                    setReportData({
+                        ...EMPTY_STATE,
+                        graphData: rawDays.map(d => ({
+                            day: d.day,
+                            minutes: 0,
+                            height: "10%"
+                        }))
                     });
                 }
             } catch (err) {
@@ -187,9 +211,7 @@ export default function ReportPage() {
                     </div>
                 </header>
 
-                {/* 🌟 하단 컨텐츠 영역만 교체됩니다 */}
                 {isToday ? (
-                    // 헤더는 위에서 그려졌으므로, SessionReportPage 내부 헤더는 숨깁니다.
                     <SessionReportPage hideHeader={true} />
                 ) : (
                     <div className={styles.grid}>
@@ -202,7 +224,10 @@ export default function ReportPage() {
 
                             <div className={styles.scoreContent}>
                                 <div className={styles.scoreValueWrap}>
-                                    <span className={styles.scoreValue}>{reportData.score}</span>
+                                    {/* 점수가 0이면 흐리게 보이거나 0으로 명확히 표시 */}
+                                    <span className={styles.scoreValue} style={reportData.score === 0 ? { color: "#a39a91" } : {}}>
+                                        {reportData.score}
+                                    </span>
                                     <span className={styles.scoreTotal}>/100</span>
                                 </div>
 
