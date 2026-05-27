@@ -230,9 +230,13 @@ export default function MeditationSetup() {
             ))}
           </div>
 
-          <p className={styles.lengthSummary}>
-            {sessionMinutes} min × {ROUNDS} rounds — {totalMinutes} minutes in total
-          </p>
+        <p className={styles.lengthSummary}>
+          {sessionMinutes === 1
+            ? "1 min × 1 round — 1 minute in total (Test)"
+            : `${sessionMinutes} min × ${ROUNDS} rounds = ${totalMinutes} minutes in total`
+          }
+        </p>
+        
         </section>
 
         {/* ── AI Assistant ── */}

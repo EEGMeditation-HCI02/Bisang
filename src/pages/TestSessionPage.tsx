@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import styles from "./css/MeditationPage.module.css"; // 기존 스타일 재사용
-import testStyles from "./css/TestSessionPage.module.css";
 import { useMeditationTimer } from "../hooks/useMeditationTimer";
 import { useMeditationMusic } from "../hooks/useMeditationMusic";
 import { useBrainwaveConnection } from "../hooks/useBrainwaveConnection";
