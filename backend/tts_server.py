@@ -20,14 +20,20 @@ class TTSRequest(BaseModel):
     text: str
     voice_id: str
 
-# 6가지 옵션 매핑 (선히, 인준)
+# 6가지 옵션 매핑 (선히, 인준) -> 원어민 음성 추가
 VOICE_MAP = {
-    "sunhi-calm": {"voice": "ko-KR-SunHiNeural", "rate": "+0%", "pitch": "+0Hz"},
-    "sunhi-slow": {"voice": "ko-KR-SunHiNeural", "rate": "-15%", "pitch": "-5Hz"},
-    "sunhi-deep": {"voice": "ko-KR-SunHiNeural", "rate": "-10%", "pitch": "-10Hz"},
-    "injoon-warm": {"voice": "ko-KR-InJoonNeural", "rate": "+0%", "pitch": "+0Hz"},
-    "injoon-slow": {"voice": "ko-KR-InJoonNeural", "rate": "-15%", "pitch": "-5Hz"},
-    "injoon-deep": {"voice": "ko-KR-InJoonNeural", "rate": "-10%", "pitch": "-15Hz"},
+    "Sunhi": {"voice": "ko-KR-SunHiNeural", "rate": "+0%", "pitch": "+0Hz"},
+    "Aria": {"voice": "en-US-AriaNeural", "rate": "+0%", "pitch": "+0Hz"},
+    "Jenny": {"voice": "en-US-JennyNeural", "rate": "+0%", "pitch": "+0Hz"},
+    "Injoon": {"voice": "ko-KR-InJoonNeural", "rate": "+0%", "pitch": "+0Hz"},
+    "Christopher": {"voice": "en-US-ChristopherNeural", "rate": "+0%", "pitch": "+0Hz"},
+    "Guy": {"voice": "en-US-GuyNeural", "rate": "+0%", "pitch": "+0Hz"},
+    # "sunhi-calm": {"voice": "ko-KR-SunHiNeural", "rate": "+0%", "pitch": "+0Hz"},
+    # "sunhi-slow": {"voice": "ko-KR-SunHiNeural", "rate": "-15%", "pitch": "-5Hz"},
+    # "sunhi-deep": {"voice": "ko-KR-SunHiNeural", "rate": "-10%", "pitch": "-10Hz"},
+    # "injoon-warm": {"voice": "ko-KR-InJoonNeural", "rate": "+0%", "pitch": "+0Hz"},
+    # "injoon-slow": {"voice": "ko-KR-InJoonNeural", "rate": "-15%", "pitch": "-5Hz"},
+    # "injoon-deep": {"voice": "ko-KR-InJoonNeural", "rate": "-10%", "pitch": "-15Hz"},
 }
 
 def remove_file(path: str):
@@ -36,7 +42,7 @@ def remove_file(path: str):
 
 @app.post("/api/tts")
 async def generate_tts(request: TTSRequest, background_tasks: BackgroundTasks):
-    v = VOICE_MAP.get(request.voice_id, VOICE_MAP["sunhi-calm"])
+    v = VOICE_MAP.get(request.voice_id, VOICE_MAP["Jenny"]) # 기본값은 Jenny로 설정
     filename = f"temp_{uuid.uuid4()}.mp3"
     
     communicate = edge_tts.Communicate(request.text, v["voice"], rate=v["rate"], pitch=v["pitch"])

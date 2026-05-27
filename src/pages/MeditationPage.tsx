@@ -209,7 +209,7 @@ export default function MeditationSession() {
     const playTTS = async () => {
       stopTTS();
       try {
-        const voiceId = user?.audio_guidance || "sunhi-calm";
+        const voiceId = user?.audio_guidance || "Jenny"; // 사용자 설정 음성 또는 기본값
         console.log(`🗣️ Speaking guidance: "${currentText}" with voice: ${voiceId}`);
         const audioObj = await playDynamicGuidance(currentText, voiceId);
         

@@ -1,10 +1,17 @@
 export const AUDIO_OPTIONS = [
     // ── Female Voices (선히) ──
-    { id: "sunhi-calm", label: "SunHi (Calm & Standard)", gender: "Female" },
-    { id: "sunhi-slow", label: "SunHi (Slow & Relaxing)", gender: "Female" },
-    { id: "sunhi-deep", label: "SunHi (Deep & Soothing)", gender: "Female" },
+    { id: "Sunhi", label: "SunHi (Korean)", gender: "Female" },
+    { id: "Aria", label: "Aria (Energetic)", gender: "Female" },
+    { id: "Jenny", label: "Jenny (Confident)", gender: "Female" },
     // ── Male Voices (인준) ──
-    { id: "injoon-warm", label: "InJoon (Warm & Gentle)", gender: "Male" },
-    { id: "injoon-slow", label: "InJoon (Slow & Grounded)", gender: "Male" },
-    { id: "injoon-deep", label: "InJoon (Deep Resonance)", gender: "Male" },
+    { id: "Injoon", label: "InJoon (Korean)", gender: "Male" },
+    { id: "Christopher", label: "Christopher (Confident)", gender: "Male" },
+    { id: "Guy", label: "Guy (Energetic)", gender: "Male" },
 ];
+
+// "Sunhi": { "voice": "ko-KR-SunHiNeural", "rate": "+0%", "pitch": "+0Hz" },
+// "Aria": { "voice": "en-US-AriaNeural", "rate": "+0%", "pitch": "+0Hz" },
+// "Jenny": { "voice": "en-US-JennyNeural", "rate": "+0%", "pitch": "+0Hz" },
+// "Injoon": { "voice": "ko-KR-InJoonNeural", "rate": "+0%", "pitch": "+0Hz" },
+// "Christopher": { "voice": "en-US-ChristopherNeural", "rate": "+0%", "pitch": "+0Hz" },
+// "Guy": { "voice": "en-US-GuyNeural", "rate": "+0%", "pitch": "+0Hz" },
