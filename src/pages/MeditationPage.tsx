@@ -19,6 +19,7 @@ import {
   DEFAULT_THEME,
   TOTAL_ROUNDS,
 } from "../constants/meditationConstants";
+import { playDynamicGuidance } from "../utils/audioUtils";
 
 import TestSaveButton from "../components/TestSaveButton"; // 테스트용
 
@@ -43,9 +44,11 @@ export default function MeditationSession() {
   // ── Local State & Refs ──
   const [showMusicPanel, setShowMusicPanel] = useState(false);
   const [sessionDetail, setSessionDetail] = useState<SessionDetail | null>(null);
-  
+
   // Brainwave metrics history array to compute session averages
   const brainwaveHistoryRef = useRef<{ attention: number; meditation: number }[]>([]);
+  // 현재 재생 중인 TTS 오디오 객체 추적
+  const currentTtsAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // ── Start Pose Analysis on Mount ──
   useEffect(() => {
@@ -69,6 +72,49 @@ export default function MeditationSession() {
       });
     }
   }, [brainwave.brainwaveMetrics, timer.isPlaying, timer.isFinished]);
+
+  // ── TTS 자동 재생 로직 추가 ──
+  useEffect(() => {
+    // 로딩 중, 명상 종료, 일시정지 상태이거나 멘트가 없으면 재생하지 않음
+    if (guidance.guidanceLoading || timer.isFinished || !timer.isPlaying || guidance.guidances.length === 0) {
+      return;
+    }
+
+    const currentText = guidance.guidances[guidance.guidanceIndex];
+    if (!currentText) return;
+
+    let isSubscribed = true;
+
+    const playGuidanceAudio = async () => {
+      try {
+        // 기존 TTS가 아직 재생 중이라면 겹치지 않게 중지
+        if (currentTtsAudioRef.current) {
+          currentTtsAudioRef.current.pause();
+          currentTtsAudioRef.current.currentTime = 0;
+        }
+
+        const audio = await playDynamicGuidance(currentText, "default");
+
+        // 비동기 처리 중 컴포넌트 언마운트 시 재생 방지
+        if (!isSubscribed) return;
+
+        currentTtsAudioRef.current = audio;
+        await audio.play();
+      } catch (error) {
+        console.error("❌ TTS 오디오 재생 실패:", error);
+      }
+    };
+
+    playGuidanceAudio();
+
+    // 클린업: 다음 멘트로 넘어가거나 화면 이탈 시 오디오 정리
+    return () => {
+      isSubscribed = false;
+      if (currentTtsAudioRef.current) {
+        currentTtsAudioRef.current.pause();
+      }
+    };
+  }, [guidance.guidanceIndex, guidance.guidances, timer.isFinished, timer.isPlaying, guidance.guidanceLoading]);
 
   // ── On Meditation Finished: Stop Analysis and Calculate Scores ──
   useEffect(() => {
@@ -129,9 +175,9 @@ export default function MeditationSession() {
 
   // ✅ Meditation Auto-save on Finish → navigates to /reports
   useSaveMeditationReport({
-    isFinished:       timer.isFinished,
+    isFinished: timer.isFinished,
     durationMin,
-    totalRounds:      TOTAL_ROUNDS,
+    totalRounds: TOTAL_ROUNDS,
     theme,
     sessionDetail,
     onSaved: () => {
