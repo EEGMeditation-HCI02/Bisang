@@ -22,12 +22,12 @@ export const THEME_QUERIES: Record<string, ThemeConfig> = {
   },
   focus: {
     label: "Focus",
-    query: "binaural focus concentration ambient",
+    query: "white noise ambient",
     emoji: "Focus",
   },
   calm: {
     label: "Calm",
-    query: "rain forest nature ambient meditation",
+    query: "rain ambient",
     emoji: "Calm",
   },
   free: {
