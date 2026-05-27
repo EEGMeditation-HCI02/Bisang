@@ -93,6 +93,7 @@ const WAVEFORM_BARS = [
 
 const ROUNDS = 4;
 const SESSION_LENGTHS = [
+  { label: "1:00 test", minutes: 1 },
   { label: "3:00", minutes: 3 },
   { label: "5:00", minutes: 5 },
   { label: "10:00", minutes: 10 },
@@ -255,7 +256,11 @@ export default function MeditationSetup() {
         <div className={styles.cta}>
           <button className={styles.beginBtn} onClick={() => {
               if (!selected) return;
-              navigate(`/meditation?duration=${sessionMinutes}&theme=${selected}`);
+              if (sessionMinutes === 1) {
+                navigate(`/testsession?duration=1&theme=${selected}`);
+              } else {
+                navigate(`/meditation?duration=${sessionMinutes}&theme=${selected}`);
+              }
             }}>
             Begin Session
             <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="20">
