@@ -10,6 +10,7 @@ import MeditationSetupPage from "./pages/MeditationSetupPage";
 import TestGuidePage from "./pages/TestGuidePage";
 import UserSettingPage from "./pages/UserSettingPage";
 import ProfilePage from "./pages/ProfilePage";
+import TestSessionPage from "./pages/TestSessionPage";
 
 import GoogleLoginButton from "./components/GoogleLoginButton";
 import LogoutButton from "./components/LogoutButton";
@@ -21,7 +22,7 @@ import ReportPage from "./pages/ReportPage";
 import SessionReportPage from "./pages/SessionReportPage";
 
 // 헤더/푸터를 숨길 경로 목록
-const HIDE_LAYOUT_PATHS = ["/meditation", "/meditationsetup"];
+const HIDE_LAYOUT_PATHS = ["/meditation", "/meditationsetup", "/testsession"];
 
 function Layout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -65,6 +66,7 @@ function App() {
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/reports" element={<ReportPage />} />
             <Route path="/sessionreports" element={<SessionReportPage />} />
+            <Route path="/testsession" element={<TestSessionPage />} />
           </Routes>
         </Layout>
       </AuthProvider>
