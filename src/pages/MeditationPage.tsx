@@ -20,7 +20,7 @@ import {
   TOTAL_ROUNDS,
 } from "../constants/meditationConstants";
 import { playDynamicGuidance } from "../utils/audioUtils";
-
+import { useUser } from "../contexts/userContextHelpers";
 
 export default function MeditationSession() {
   const navigate = useNavigate();
@@ -29,6 +29,8 @@ export default function MeditationSession() {
   const durationMin = parseInt(searchParams.get("duration") || "3");
   const theme = searchParams.get("theme") || DEFAULT_THEME;
 
+  const { user } = useUser();
+
   // ── Custom Hooks ──
   const timer = useMeditationTimer({ durationMin, totalRounds: TOTAL_ROUNDS });
   const themeQuery = THEME_QUERIES[theme]?.query ?? THEME_QUERIES[DEFAULT_THEME].query;
@@ -36,7 +38,7 @@ export default function MeditationSession() {
   const brainwave = useBrainwaveConnection();
   const { isUnstable, unstableCount } = useMotionStability();
   const guidance = useMeditationGuidance(theme);
-  const { startSession, stopSession } = usePoseAnalysis();
+  const { startSession, stopSession, isBadPosture, isEyeClosed } = usePoseAnalysis();
 
   // ── Zustand Store ──
   const setLatestSessionResult = useMeditationStore((state) => state.setLatestSessionResult);
@@ -182,12 +184,68 @@ export default function MeditationSession() {
     sessionDetail,
     onSaved: () => {
       music.stopMusic();
-      navigate("/reports", { state: { isJustFinished: true } });
+      navigate("/reports", { state: { isJustFinished: true, theme } });
     },
   });
 
+  // ── TTS playback for meditation guide subtitles ──
+  const activeAudioRef = useRef<HTMLAudioElement | null>(null);
+
+  const stopTTS = () => {
+    if (activeAudioRef.current) {
+      activeAudioRef.current.pause();
+      activeAudioRef.current.currentTime = 0;
+      activeAudioRef.current = null;
+    }
+  };
+
+  useEffect(() => {
+    if (!timer.isPlaying || timer.isFinished || guidance.guidanceLoading) {
+      stopTTS();
+      return;
+    }
+
+    const currentText = guidance.guidances[guidance.guidanceIndex];
+    if (!currentText) return;
+
+    const playTTS = async () => {
+      stopTTS();
+      try {
+        const voiceId = user?.audio_guidance || "sunhi-calm";
+        console.log(`🗣️ Speaking guidance: "${currentText}" with voice: ${voiceId}`);
+        const audioObj = await playDynamicGuidance(currentText, voiceId);
+        
+        if (timer.isPlaying) {
+          activeAudioRef.current = audioObj;
+          audioObj.play();
+        }
+      } catch (err) {
+        console.warn("⚠️ TTS playback failed:", err);
+      }
+    };
+
+    playTTS();
+
+    return () => {
+      stopTTS();
+    };
+  }, [guidance.guidanceIndex, guidance.guidances, timer.isPlaying, timer.isFinished, guidance.guidanceLoading, user?.audio_guidance]);
+
   // ── Derived ──
   const themeInfo = THEME_QUERIES[theme] ?? THEME_QUERIES[DEFAULT_THEME];
+
+  let correctionText = "";
+  if (!timer.isFinished && !guidance.guidanceLoading && timer.isPlaying) {
+    if (isUnstable) {
+      correctionText = "Keep your body still";
+    } else if (isBadPosture) {
+      correctionText = "Align your posture";
+    } else if (!isEyeClosed) {
+      correctionText = "Gently close your eyes";
+    } else if (brainwave.brainwaveState === "unstable") {
+      correctionText = "Return to your breath";
+    }
+  }
 
   return (
     <main className={styles.root}>
@@ -272,11 +330,25 @@ export default function MeditationSession() {
             </div>
           </div>
 
+          {/* Correction / Stability warning badge */}
+          <div className={styles.correctionContainer}>
+            {correctionText ? (
+              <div className={styles.correctionBadge}>
+                <svg className={styles.warningIcon} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <line x1="12" y1="8" x2="12" y2="12" />
+                  <line x1="12" y1="16" x2="12.01" y2="16" />
+                </svg>
+                <span>{correctionText}</span>
+              </div>
+            ) : (
+              <div className={styles.correctionEmpty} />
+            )}
+          </div>
+
           <GuidanceText
             isFinished={timer.isFinished}
             isLoading={guidance.guidanceLoading}
-            isUnstable={isUnstable}
-            brainwaveState={brainwave.brainwaveState}
             guidances={guidance.guidances}
             guidanceIndex={guidance.guidanceIndex}
           />

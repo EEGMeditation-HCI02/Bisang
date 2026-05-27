@@ -7,6 +7,7 @@ export type UserType = {
   avatar_url?: string;
   age_group?: string;
   primary_focus?: string;
+  audio_guidance?: string;
 };
 
 export type UserContextType = {

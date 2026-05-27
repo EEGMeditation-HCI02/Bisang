@@ -89,7 +89,7 @@ export default function ProfilePage() {
   const [name, setName] = useState("Unknown User");
   const [age, setAge] = useState("");
   const [focus, setFocus] = useState("calm");
-  const [avatarUrl, setAvatarUrl] = useState("/public/assets/default_profile.svg");
+  const [avatarUrl, setAvatarUrl] = useState("/assets/default_profile.svg");
   const [streak, setStreak] = useState("42 Days");
   const [syncStatus, setSyncStatus] = useState("Active");
   const [isLoading, setIsLoading] = useState(false);
@@ -162,12 +162,12 @@ export default function ProfilePage() {
     }
   };
 
-  // ── 이미지 업로드 로직 ──
+  // ── Image Upload Logic ──
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
     if (!supabase) {
-      alert("데이터베이스(Supabase)가 연결되지 않았습니다. 환경변수 설정을 확인해주세요.");
+      alert("Supabase is not connected. Please check your environment variables.");
       return;
     }
 
@@ -197,8 +197,8 @@ export default function ProfilePage() {
       setAvatarUrl(publicUrl);
     } catch (err: unknown) {
       console.error("Failed to upload image:", err);
-      const errorMessage = err instanceof Error ? err.message : "알 수 없는 에러";
-      alert(`이미지 업로드에 실패했습니다.\n사유: ${errorMessage}`);
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      alert(`Failed to upload image.\nReason: ${errorMessage}`);
     }
   };
 

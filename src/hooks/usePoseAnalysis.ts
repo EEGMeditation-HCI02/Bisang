@@ -1,4 +1,4 @@
-import { useEffect, useRef, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 
 // ============================================================
 // 타입 정의
@@ -126,6 +126,9 @@ function eyeAspectRatio(
 // 훅
 // ============================================================
 export function usePoseAnalysis() {
+  const [isBadPosture, setIsBadPosture] = useState(false);
+  const [isEyeClosed, setIsEyeClosed] = useState(true);
+
   const videoRef   = useRef<HTMLVideoElement | null>(null);
   const streamRef  = useRef<MediaStream | null>(null);
   const rafRef     = useRef<number | null>(null);
@@ -222,6 +225,7 @@ export function usePoseAnalysis() {
       if (poseResult.landmarks?.length > 0) {
         const lm = poseResult.landmarks[0];
         const { isBad } = computePostureMetrics(lm, prevLmRef.current);
+        setIsBadPosture(isBad);
 
         // EMA 적용 (통계용 isBad는 raw 값 기반으로도 충분)
         const a = CONFIG.emaAlpha;
@@ -236,6 +240,8 @@ export function usePoseAnalysis() {
         prevLmRef.current = lm.map((p: {x:number;y:number;z:number}) =>
           ({ x: p.x, y: p.y, z: p.z })
         );
+      } else {
+        setIsBadPosture(false);
       }
 
       // ── Face / Eye ──
@@ -267,6 +273,9 @@ export function usePoseAnalysis() {
           } else if (eyeState.closed) {
             eyeState.closedFrames++;
           }
+          setIsEyeClosed(eyeState.closed);
+        } else {
+          setIsEyeClosed(true);
         }
 
         // 시간 누적 (눈 감음 / 뜸)
@@ -365,5 +374,5 @@ export function usePoseAnalysis() {
     };
   }, [stopSession]);
 
-  return { startSession, stopSession };
+  return { startSession, stopSession, isBadPosture, isEyeClosed };
 }

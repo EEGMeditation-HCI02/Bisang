@@ -34,6 +34,22 @@ export default function ReportPage() {
 
     const isJustFinished = location.state?.isJustFinished;
 
+    const themeKey = location.state?.theme || "meditation";
+    const themeLabels: Record<string, string> = {
+        "self-esteem": "Self-Esteem",
+        "relationships": "Relationships",
+        "rest": "Rest",
+        "focus": "Focus",
+        "calm": "Calm",
+        "free": "Free"
+    };
+    const themeName = themeLabels[themeKey] || (themeKey.charAt(0).toUpperCase() + themeKey.slice(1));
+
+    const formattedTime = new Date().toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+    });
+
     const [reportData, setReportData] = useState(EMPTY_STATE);
     const [activeTab, setActiveTab] = useState(isJustFinished ? "today" : "Weekly");
 
@@ -187,7 +203,7 @@ export default function ReportPage() {
                                 <p className={styles.date}>
                                     {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                                 </p>
-                                <p className={styles.sessionTheme}>10:30 AM — Morning Serenity</p>
+                                <p className={styles.sessionTheme}>{formattedTime} — {themeName} Session</p>
                             </div>
                         ) : (
                             toggleSwitch

@@ -111,7 +111,7 @@ export const MusicPanel: FC<MusicPanelProps> = ({
           <p className={styles.soundStatusError}>⚠ {soundError}</p>
         )}
         {!soundError && sounds.length === 0 && (
-          <p className={styles.soundStatus}>음악 로딩 중...</p>
+          <p className={styles.soundStatus}>Loading music...</p>
         )}
         {sounds.map((sound) => (
           <button

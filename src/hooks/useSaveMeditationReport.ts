@@ -24,11 +24,9 @@ export function useSaveMeditationReport({
   const savedRef = useRef(false); // 중복 저장 방지
 
   useEffect(() => {
-    // 1. 전역 supabase 객체를 내부 로컬 상수로 할당하여 TypeScript가 안전하게 추론하도록 만듭니다.
     const client = supabase;
-
-    // 2. 할당된 client가 null인지 검사하여 하단 비동기 로직에서의 'possibly null' 에러를 원천 차단합니다.
-    if (!isFinished || !sessionDetail || savedRef.current || !user || !client) return;
+    const currentUser = user;
+    if (!isFinished || !sessionDetail || savedRef.current || !currentUser || !client) return;
     savedRef.current = true;
 
     const save = async () => {
@@ -53,7 +51,7 @@ export function useSaveMeditationReport({
         const { data: profile } = await client
           .from("profiles")
           .select("current_streak, last_session_date")
-          .eq("id", user.id)
+          .eq("id", currentUser.id)
           .single();
 
         let newStreak = 1; // 기본값 1
@@ -86,7 +84,7 @@ export function useSaveMeditationReport({
         const { data: pastData } = await client
           .from("meditation_reports")
           .select("created_at, total_duration")
-          .eq("user_id", user.id)
+          .eq("user_id", currentUser.id)
           .gte("created_at", sevenDaysAgo.toISOString())
           .order("created_at", { ascending: true });
 
@@ -124,11 +122,11 @@ export function useSaveMeditationReport({
           height: `${Math.max(10, Math.round((d.minutes / maxMins) * 100))}%`,
         }));
 
-        // ── AI 피드백 (Gemini API) ──────────────────────────────
+        // ── AI Feedback (Gemini API) ──────────────────────────────
         let ai_pattern =
-          `이번 ${theme} 명상 세션에서 ${score}%의 안정도를 보여주셨습니다.`;
+          `You achieved a meditation score of ${score} points in this ${theme} meditation session.`;
         let ai_recommendation =
-          `자세를 편안하게 유지하고, ${durationMin}분씩 꾸준히 명상을 이어가 보세요.`;
+          `Try to maintain a comfortable posture and continue meditating for ${durationMin} minutes consistently.`;
 
         const apiKey = import.meta.env.VITE_AI_API_KEY;
         if (apiKey) {
@@ -138,22 +136,22 @@ export function useSaveMeditationReport({
               : 80;
 
             const aiPrompt = `Meditation session summary:
-- Theme: ${theme} (명상 테마)
+- Theme: ${theme} (Meditation Theme)
 - Total time: ${totalMinutes} minutes
-- Composite Score: ${score}/100 (종합 명상 점수)
-- Posture score: ${sessionDetail.postureScore}/100 (자세 안정성 점수)
-- Posture disruptions: ${sessionDetail.unstableCount} times (자세 흐트러짐 횟수)
-- Eye closed duration ratio: ${eyeClosedRatioPercent}% (눈감음 비율)
-- Blinks count: ${sessionDetail.blinkCount} times (눈 깜빡임 횟수)
-- Brainwave attention: ${sessionDetail.attentionAvg}/100 (집중도 평균)
-- Brainwave meditation: ${sessionDetail.meditationAvg}/100 (명상도 평균)
+- Composite Score: ${score}/100 (Overall Meditation Score)
+- Posture score: ${sessionDetail.postureScore}/100 (Posture Stability Score)
+- Posture disruptions: ${sessionDetail.unstableCount} times (Posture Disruptions)
+- Eye closed duration ratio: ${eyeClosedRatioPercent}% (Eye Closure Ratio)
+- Blinks count: ${sessionDetail.blinkCount} times (Blink Count)
+- Brainwave attention: ${sessionDetail.attentionAvg}/100 (Attention Average)
+- Brainwave meditation: ${sessionDetail.meditationAvg}/100 (Meditation Average)
 
-Based on this data, write a 1-2 sentence pattern observation ("pattern") and a 1-2 sentence recommendation ("recommendation") in Korean.
+Based on this data, write a 1-2 sentence pattern observation ("pattern") and a 1-2 sentence recommendation ("recommendation") in English.
 For pattern, focus on their brainwave stability, posture consistency, and eye closure.
 For recommendation, give actionable tips to improve focus or relaxation.
 Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
             const response = await fetch(endpoint, {
               method: "POST",
@@ -191,7 +189,7 @@ Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
 
         const [reportResult, profileResult] = await Promise.all([
           client.from("meditation_reports").insert({
-            user_id: user.id,
+            user_id: currentUser.id,
             score,
             trend,
             total_duration,
@@ -205,7 +203,7 @@ Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
           client.from("profiles").update({
             current_streak: newStreak,
             last_session_date: today
-          }).eq("id", user.id)
+          }).eq("id", currentUser.id)
         ]);
 
         if (reportResult.error) throw reportResult.error;
@@ -220,5 +218,5 @@ Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
     };
 
     save();
-  }, [isFinished, sessionDetail]);
+  }, [isFinished, sessionDetail, user, supabase, durationMin, totalRounds, theme, onSaved]);
 }

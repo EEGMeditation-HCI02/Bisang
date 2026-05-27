@@ -7,14 +7,14 @@ const STEPS = [
     number: "01",
     title: "Place on head",
     desc: "Gently place the MindWave band over your crown. The flexible frame is designed to expand organically, ensuring a secure yet soft pressure-free experience for any head shape.",
-    imgSrc: "/public/assets/mindwave_step1.png",
+    imgSrc: "/assets/mindwave_step1.png",
     imgAlt: "Placement",
   },
   {
     number: "02",
     title: "Adjust sensor to forehead",
     desc: "The primary dry-sensor should rest comfortably against your forehead, just above the left eyebrow. This is the bridge between your external world and internal focus.",
-    imgSrc: "/public/assets/mindwave_step2.png",
+    imgSrc: "/assets/mindwave_step2.png",
     imgAlt: "Forehead Sensor",
   },
 ];
@@ -48,7 +48,7 @@ export default function MindWaveGuide() {
           <div className={`${styles.card} ${styles.cardDevice}`}>
             <div className={styles.cardBody}>
               <div>
-                <span className={styles.badge}>The Device</span>
+                <span className={styles.badge}>Neurosky MindWave Mobile 2</span>
                 <h2 className={styles.cardTitle}>Precision Engineering</h2>
                 <p className={styles.cardText}>
                   Our minimalist headset uses medical-grade sensors to map your neural rhythms with zero intrusive wires.
@@ -56,7 +56,7 @@ export default function MindWaveGuide() {
               </div>
               <div className={styles.deviceImgWrap}>
                 <img
-                  src="/public/assets/mindwave_device.png"
+                  src="/assets/mindwave_device.png"
                   alt="MindWave Device"
                   className={styles.deviceImg}
                 />
@@ -88,7 +88,7 @@ export default function MindWaveGuide() {
             </div>
             <div className={styles.earImgWrap}>
               <img
-                src="/public/assets/mindwave_step3.png"
+                src="/assets/mindwave_step3.png"
                 alt="Ear Sensor"
                 className={styles.earImg}
               />
@@ -101,7 +101,7 @@ export default function MindWaveGuide() {
           <div
             className={styles.ctaBg}
             style={{
-              backgroundImage: `url("/public/assets/mindwave_cta_bg.png")`,
+              backgroundImage: `url("/assets/mindwave_cta_bg.png")`,
             }}
           />
           <div className={styles.ctaContent}>

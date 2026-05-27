@@ -185,9 +185,7 @@
   width: 6.5rem;
   height: 6.5rem;
   border-radius: var(--radius-full);
-  background: rgba(254, 249, 243, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: url("/assets/orb.png") no-repeat center/contain;
   box-shadow: var(--shadow-orb);
   display: flex;
   align-items: center;
