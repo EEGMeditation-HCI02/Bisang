@@ -94,8 +94,8 @@ export default function ProfilePage() {
   const [syncStatus, setSyncStatus] = useState("Active");
   const [isLoading, setIsLoading] = useState(false);
 
-  // Sanctuary Preferences
-  const [aural] = useState("Tibetan Bowls");
+  // // Sanctuary Preferences
+  // const [aural] = useState("Tibetan Bowls");
 
   // Audio Guidance 관련 상태 추가
   const [audio, setAudio] = useState("female-calm"); // 기본값 ID
