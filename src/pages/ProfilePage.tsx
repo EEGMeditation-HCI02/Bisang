@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useContext } from "react";
 import styles from "./css/ProfilePage.module.css";
 import { supabase } from "../lib/supabaseClient";
 import { UserContext } from "../contexts/userContextHelpers";
+// 새로 추가된 컴포넌트 및 옵션 임포트
 import AudioGuidanceModal from "../components/AudioGuidanceModal";
 import { AUDIO_OPTIONS } from "../constants/audioOptions";
 
@@ -89,12 +90,15 @@ export default function ProfilePage() {
   const [age, setAge] = useState("");
   const [focus, setFocus] = useState("calm");
   const [avatarUrl, setAvatarUrl] = useState("/public/assets/default_profile.svg");
-  const [streak, setStreak] = useState("0 Days"); // 초기값을 0으로 변경
+  const [streak, setStreak] = useState("42 Days");
   const [syncStatus, setSyncStatus] = useState("Active");
   const [isLoading, setIsLoading] = useState(false);
 
+  // // Sanctuary Preferences
+  // const [aural] = useState("Tibetan Bowls");
+
   // Audio Guidance 관련 상태 추가
-  const [audio, setAudio] = useState("Sunhi"); // 기본값 ID
+  const [audio, setAudio] = useState("female-calm"); // 기본값 ID
   const [isAudioModalOpen, setIsAudioModalOpen] = useState(false);
 
   // 현재 선택된 오디오의 라벨 찾기 (화면 표시용)
@@ -107,7 +111,7 @@ export default function ProfilePage() {
       try {
         const { data, error } = await supabase
           .from("profiles")
-          // 예전 streak_days 대신 current_streak 컬럼을 불러옵니다.
+          // audio_guidance 추가
           .select("name, age_group, primary_focus, avatar_url, current_streak, sync_active, audio_guidance")
           .eq("id", user.id)
           .single();
@@ -119,11 +123,9 @@ export default function ProfilePage() {
           if (data.age_group) setAge(data.age_group);
           if (data.primary_focus) setFocus(data.primary_focus);
           if (data.avatar_url) setAvatarUrl(data.avatar_url);
-          // current_streak 값으로 동기화
-          if (data.current_streak !== null && data.current_streak !== undefined) {
-            setStreak(`${data.current_streak} Days`);
-          }
+          if (data.current_streak !== null && data.current_streak !== undefined) setStreak(`${data.current_streak} Days`);
           if (data.sync_active !== null && data.sync_active !== undefined) setSyncStatus(data.sync_active ? "Active" : "Inactive");
+          // DB에 오디오 세팅이 있으면 덮어쓰기
           if (data.audio_guidance) setAudio(data.audio_guidance);
         }
       } catch (err) {
@@ -146,7 +148,7 @@ export default function ProfilePage() {
           name: name,
           age_group: age,
           primary_focus: focus,
-          audio_guidance: audio,
+          audio_guidance: audio, // audio_guidance 저장 추가
         })
         .eq("id", user.id);
 
@@ -269,6 +271,17 @@ export default function ProfilePage() {
                 </div>
 
                 <div className={styles.preferencesList}>
+                  {/* <div className={styles.preferenceRow}>
+                    <div className={styles.preferenceInfo}>
+                      <div className={styles.preferenceName}>Aural Atmosphere</div>
+                      <div className={styles.preferenceSelected}>Selected: {aural}</div>
+                    </div>
+                    <svg className={styles.chevronRight} width="12" height="8" viewBox="0 0 12 8" fill="none">
+                      <path d="M1 1.5L6 6.5L11 1.5" stroke="#A8A29E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </div> */}
+
+                  {/* Audio Guidance 팝업 오픈을 위한 클릭 이벤트 연결 */}
                   <div className={styles.preferenceRow} onClick={() => setIsAudioModalOpen(true)}>
                     <div className={styles.preferenceInfo}>
                       <div className={styles.preferenceName}>Audio Guidance</div>
