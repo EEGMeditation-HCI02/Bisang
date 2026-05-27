@@ -48,7 +48,7 @@ export function useMeditationGuidance(theme: string): UseGuidanceReturn {
     };
   }, [theme]);
 
-  // 멘트 회전 타이머 (10초마다)
+  // 멘트 회전 타이머 (20초마다)
   useEffect(() => {
     if (guidances.length === 0 || guidanceLoading) return;
 
@@ -56,7 +56,7 @@ export function useMeditationGuidance(theme: string): UseGuidanceReturn {
 
     guidanceIntervalRef.current = setInterval(() => {
       setGuidanceIndex((prev) => (prev + 1) % guidances.length);
-    }, 10000);
+    }, 20000);
 
     return () => {
       if (guidanceIntervalRef.current)
