@@ -31,7 +31,8 @@ export default function MeditationSession() {
 
   // ── Custom Hooks ──
   const timer = useMeditationTimer({ durationMin, totalRounds: TOTAL_ROUNDS });
-  const music = useMeditationMusic(theme);
+  const themeQuery = THEME_QUERIES[theme]?.query ?? THEME_QUERIES[DEFAULT_THEME].query;
+  const music = useMeditationMusic(themeQuery);
   const brainwave = useBrainwaveConnection();
   const { isUnstable, unstableCount } = useMotionStability();
   const guidance = useMeditationGuidance(theme);
