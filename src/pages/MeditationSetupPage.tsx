@@ -1,6 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useContext } from "react";
 import { useNavigate } from 'react-router-dom';
 import styles from "./css/MeditationSetupPage.module.css";
+import { supabase } from "../lib/supabaseClient";
+import { UserContext } from "../contexts/userContextHelpers";
 
 const THEMES = [
   {
@@ -98,10 +100,68 @@ const SESSION_LENGTHS = [
 
 export default function MeditationSetup() {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState("relationships");
+  const { user } = useContext(UserContext);
+
+  const [selected, setSelected] = useState<string | null>(null);
   const [sessionMinutes, setSessionMinutes] = useState(3);
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
   const totalMinutes = sessionMinutes * ROUNDS;
+
+  // ── Profile의 primary_focus 불러오기 ──
+  useEffect(() => {
+    const fetchFocus = async () => {
+      if (!user || !supabase) {
+        // 비로그인 상태면 기본값 적용
+        setSelected("relationships");
+        setProfileLoaded(true);
+        return;
+      }
+ 
+      try {
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("primary_focus")
+          .eq("id", user.id)
+          .single();
+ 
+        if (!error && data?.primary_focus) {
+          setSelected(data.primary_focus);
+        } else {
+          // DB에 값 없으면 기본값
+          setSelected("relationships");
+        }
+      } catch {
+        setSelected("relationships");
+      } finally {
+        setProfileLoaded(true);
+      }
+    };
+ 
+    fetchFocus();
+  }, [user]);
+
+  // 로딩 중에는 카드 렌더링 스킵 (깜박임 방지)
+  if (!profileLoaded) {
+    return (
+      <div className={styles.root}>
+        <header className={styles.header}>
+          <button className={styles.backBtn} aria-label="Go back" onClick={() => navigate('/dashboard')}>
+            <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="20">
+              <path d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <h1 className={styles.brand}>BiSang</h1>
+          <div className={styles.headerSpacer} />
+        </header>
+        <main className={styles.main}>
+          <div style={{ display: "flex", justifyContent: "center", padding: "80px 0", color: "#a39a91" }}>
+            Loading your preferences...
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.root}>
@@ -186,12 +246,17 @@ export default function MeditationSetup() {
               />
             ))}
           </div>
-          <p className={styles.aiQuote}>"Tell me more about your relationships today..."</p>
+          <p className={styles.aiQuote}>
+            "Tell me more about your {THEMES.find(t => t.id === selected)?.label.toLowerCase()} today..."
+          </p>
         </section>
 
         {/* ── CTA ── */}
         <div className={styles.cta}>
-          <button className={styles.beginBtn} onClick={() => navigate(`/meditation?duration=${sessionMinutes}&theme=${selected}`)}>
+          <button className={styles.beginBtn} onClick={() => {
+              if (!selected) return;
+              navigate(`/meditation?duration=${sessionMinutes}&theme=${selected}`);
+            }}>
             Begin Session
             <svg fill="none" height="20" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="20">
               <path d="M5 12h14m-7-7 7 7-7 7" />
