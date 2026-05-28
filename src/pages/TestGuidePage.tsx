@@ -208,27 +208,36 @@ export default function TestGuidePage() {
   useEffect(() => {
     parserRef.current = new MindWaveParser();
     parserRef.current.onData = (data: Record<string, unknown>) => {
-      const attention = (data.attention as number) ?? 0;
-      const meditation = (data.meditation as number) ?? 0;
-      
-      setMindwaveData((prev) => ({
-        attention,
-        meditation,
-        poorSignal: (data.poorSignal as number) ?? prev.poorSignal,
-        eegPower: (data.eegPower as Record<string, number>) ?? prev.eegPower,
-      }));
+      const hasAttention = data.attention !== undefined;
+      const hasMeditation = data.meditation !== undefined;
+      const hasPoorSignal = data.poorSignal !== undefined;
+      const hasEegPower = data.eegPower !== undefined;
 
-      // Update chart data
-      setChartData((prev) => {
-        const newData = [...prev.slice(1)];
-        dataCountRef.current += 1;
-        newData.push({
-          time: `${dataCountRef.current * 0.5}s`,
-          attention,
-          meditation,
-        });
-        return newData;
-      });
+      // Only update state if we received at least one relevant metric (ignore raw wave packets which flood at 512Hz)
+      if (hasAttention || hasMeditation || hasPoorSignal || hasEegPower) {
+        setMindwaveData((prev) => ({
+          attention: hasAttention ? (data.attention as number) : prev.attention,
+          meditation: hasMeditation ? (data.meditation as number) : prev.meditation,
+          poorSignal: hasPoorSignal ? (data.poorSignal as number) : prev.poorSignal,
+          eegPower: hasEegPower ? (data.eegPower as Record<string, number>) : prev.eegPower,
+        }));
+
+        // Only update chart data on 1Hz attention/meditation updates
+        if (hasAttention || hasMeditation) {
+          const attention = (data.attention as number) ?? 0;
+          const meditation = (data.meditation as number) ?? 0;
+          setChartData((prev) => {
+            const newData = [...prev.slice(1)];
+            dataCountRef.current += 1;
+            newData.push({
+              time: `${dataCountRef.current}s`,
+              attention,
+              meditation,
+            });
+            return newData;
+          });
+        }
+      }
     };
 
     return () => {
