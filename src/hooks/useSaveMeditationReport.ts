@@ -24,17 +24,13 @@ export function useSaveMeditationReport({
   const savedRef = useRef(false); // 중복 저장 방지
 
   useEffect(() => {
-    // Proceed once the session is finished and sessionDetail is available
-    if (!isFinished || !sessionDetail || savedRef.current) return;
+    const client = supabase;
+    const currentUser = user;
+    if (!isFinished || !sessionDetail || savedRef.current || !currentUser || !client) return;
     savedRef.current = true;
 
     const save = async () => {
       try {
-        if (!user || !supabase) {
-          console.warn("⚠️ User not logged in or Supabase not connected. Skipping DB save, redirecting to reports.");
-          return;
-        }
-
         const totalMinutes = durationMin * totalRounds;
         const score = sessionDetail.score;
 
@@ -44,39 +40,51 @@ export function useSaveMeditationReport({
         // ── trend ──────────────────────────────────────────────
         const trend =
           score >= 80 ? "Great session" :
-          score >= 60 ? "Good progress" :
-          "Keep going";
+            score >= 60 ? "Good progress" :
+              "Keep going";
 
-        // ── current_streak ─────────────────────────────────────
+        // ── current_streak 계산 및 프로필 동기화 ────────────────
         const today = new Date().toISOString().split("T")[0];
-        const yesterday = new Date(Date.now() - 86400000)
-          .toISOString()
-          .split("T")[0];
+        const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
 
-        const { data: yesterdayData } = await supabase!
-          .from("meditation_reports")
-          .select("current_streak")
-          .eq("user_id", user.id)
-          .gte("created_at", `${yesterday}T00:00:00`)
-          .lt("created_at", `${today}T00:00:00`)
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
+        // 프로필에서 기존 스트릭과 마지막 세션 날짜 가져오기 (단일 진실 공급원)
+        const { data: profile } = await client
+          .from("profiles")
+          .select("current_streak, last_session_date")
+          .eq("id", currentUser.id)
+          .single();
 
-        const prevStreak = yesterdayData?.current_streak
-          ? parseInt(String(yesterdayData.current_streak).replace(/[^0-9]/g, ""), 10)
-          : 0;
-        const current_streak = `${prevStreak + 1} Days`;
+        let newStreak = 1; // 기본값 1
+
+        if (profile) {
+          const prevStreak = typeof profile.current_streak === 'number'
+            ? profile.current_streak
+            : 0;
+
+          if (profile.last_session_date === today) {
+            // 오늘 이미 명상 기록이 있다면 (하루 여러 번 시도), 스트릭 유지
+            newStreak = prevStreak || 1;
+          } else if (profile.last_session_date === yesterday) {
+            // 어제 명상을 했고 오늘 첫 시도라면 스트릭 +1
+            newStreak = prevStreak + 1;
+          } else {
+            // 며칠 쉬었거나 기록이 없는 경우 1로 초기화
+            newStreak = 1;
+          }
+        }
+
+        // 리포트 테이블 저장을 위한 문자열 포맷
+        const current_streak_str = `${newStreak} Days`;
 
         // ── graph_data: 오늘 포함 7일치 ────────────────────────
         const sevenDaysAgo = new Date();
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
         sevenDaysAgo.setHours(0, 0, 0, 0);
 
-        const { data: pastData } = await supabase!
+        const { data: pastData } = await client
           .from("meditation_reports")
           .select("created_at, total_duration")
-          .eq("user_id", user.id)
+          .eq("user_id", currentUser.id)
           .gte("created_at", sevenDaysAgo.toISOString())
           .order("created_at", { ascending: true });
 
@@ -143,7 +151,7 @@ For pattern, focus on their brainwave stability, posture consistency, and eye cl
 For recommendation, give actionable tips to improve focus or relaxation.
 Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`;
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
             const response = await fetch(endpoint, {
               method: "POST",
@@ -164,7 +172,7 @@ Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
               const jsonMatch = text.match(/\{[\s\S]*\}/);
               if (jsonMatch) {
                 const parsed = JSON.parse(jsonMatch[0]);
-                if (parsed.pattern)       ai_pattern       = parsed.pattern;
+                if (parsed.pattern) ai_pattern = parsed.pattern;
                 if (parsed.recommendation) ai_recommendation = parsed.recommendation;
               }
             }
@@ -173,27 +181,35 @@ Respond ONLY as JSON: {"pattern": "...", "recommendation": "..."}`;
           }
         }
 
-        // ── Supabase INSERT ─────────────────────────────────────
+        // ── Supabase 병렬 처리 (Report Insert & Profile Update) ──
         const graph_payload = {
           weekly_graph: weeklyGraph,
           session_detail: sessionDetail,
         };
 
-        const { error } = await supabase!.from("meditation_reports").insert({
-          user_id:             user.id,
-          score,
-          trend,
-          total_duration,
-          sessions_completed:  totalRounds,
-          current_streak,
-          graph_data:          graph_payload,
-          ai_pattern,
-          ai_recommendation,
-          created_at:          new Date().toISOString(),
-        });
+        const [reportResult, profileResult] = await Promise.all([
+          client.from("meditation_reports").insert({
+            user_id: currentUser.id,
+            score,
+            trend,
+            total_duration,
+            sessions_completed: totalRounds,
+            current_streak: current_streak_str,
+            graph_data: graph_payload,
+            ai_pattern,
+            ai_recommendation,
+            created_at: new Date().toISOString(),
+          }),
+          client.from("profiles").update({
+            current_streak: newStreak,
+            last_session_date: today
+          }).eq("id", currentUser.id)
+        ]);
 
-        if (error) throw error;
-        console.log("✅ Meditation report saved successfully");
+        if (reportResult.error) throw reportResult.error;
+        if (profileResult.error) console.warn("프로필 업데이트 실패:", profileResult.error);
+
+        console.log("✅ Meditation report & profile updated successfully");
       } catch (err) {
         console.error("❌ Save failed:", err);
       } finally {
