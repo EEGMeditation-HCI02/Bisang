@@ -359,7 +359,7 @@ export default function ProfilePage() {
                 </button>
               </div>
               <h2 className={styles.profileName}>{name}</h2>
-              <p className={styles.profileRole}>Have a peaceful day, {name}!</p>
+              <p className={styles.profileRole}>Master Practitioner • 428 Hours</p>
             </div>
 
             <div className={styles.statsDivider} />
